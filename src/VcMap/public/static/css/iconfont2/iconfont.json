@@ -1,0 +1,23 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "429669",
+      "name": "点查询",
+      "font_class": "dianchaxun",
+      "unicode": "e896",
+      "unicode_decimal": 59542
+    },
+    {
+      "icon_id": "7179841",
+      "name": "矩形查询",
+      "font_class": "juxingchaxun",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    }
+  ]
+}

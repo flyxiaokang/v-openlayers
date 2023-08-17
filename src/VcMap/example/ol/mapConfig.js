@@ -1,0 +1,234 @@
+/*
+ * @Description:
+ * @Version:
+ * @Author: kangjinrui
+ * @Date: 2022-01-19 09:44:36
+ * @LastEditors: kangjinrui
+ * @LastEditTime: 2023-07-10 16:09:01
+ */
+import { MAP_TYPE_ENUM } from '@/VcMap/global'
+
+const mapConfig = {
+    prj: 'EPSG:4326',
+    defaultView: {
+        projection: 'EPSG:4326',
+        center: [104.53125000000001, 32.70263671875],
+        zoom: 5,
+        minZoom: 0,
+        maxZoom: 20,
+    },
+    mapExtent: {
+        center: [104.53125000000001, 32.70263671875],
+        zoom: 5,
+        minZoom: 0,
+        maxZoom: 20,
+    },
+    defaultBaseMapId: 'tdt_vec',
+
+    baseLayers: [
+        {
+            id: '2',
+            label: '矢量',
+            type: 'layerGroup',
+            children: [
+                {
+                    id: 'tdt_vec',
+                    label: '天地图矢量',
+                    children: [
+                        {
+                            id: 'tdt_vec_c',
+                            visible: false,
+                            type: 'tdt',
+                            image: new URL(
+                                '@/VcMap/ol/v3/assets/image/baseMap/vector.jpg',
+                                import.meta.url
+                            ).href,
+                            url: 'http://t{0-7}.tianditu.gov.cn/vec_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&tk=7688a7a777410e626f6e5730f3fdf384&LAYER=vec&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&tilecol={x}&tilerow={y}&tilematrix={z}',
+                        },
+                        {
+                            id: 'tdt_vec_c_label',
+                            visible: false,
+                            type: 'tdt',
+                            url: 'http://t{0-7}.tianditu.gov.cn/cva_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&tk=7688a7a777410e626f6e5730f3fdf384&LAYER=cva&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&tilecol={x}&tilerow={y}&tilematrix={z}',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            id: '3',
+            label: '影像',
+            type: 'layerGroup',
+            children: [
+                {
+                    id: 'tdt_img',
+                    label: '天地图影像',
+                    visible: false,
+                    type: 'tdt',
+                    image: new URL(
+                        '@/VcMap/ol/v3/assets/image/baseMap/image.jpg',
+                        import.meta.url
+                    ).href,
+                    url: 'http://t{0-7}.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&tk=7688a7a777410e626f6e5730f3fdf384&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&tilecol={x}&tilerow={y}&tilematrix={z}',
+                },
+            ],
+        },
+        {
+            id: '4',
+            label: '地形',
+            type: 'layerGroup',
+            children: [
+                {
+                    id: 'tdt_ter',
+                    label: '天地图地形',
+                    visible: false,
+                    type: 'tdt',
+                    image: new URL(
+                        '@/VcMap/ol/v3/assets/image/baseMap/terrian.jpg',
+                        import.meta.url
+                    ).href,
+                    url: 'http://t{0-7}.tianditu.gov.cn/ter_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&tk=7688a7a777410e626f6e5730f3fdf384&LAYER=ter&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&tilecol={x}&tilerow={y}&tilematrix={z}',
+                },
+            ],
+        },
+        {
+			id: "5",
+			label: "高德",
+			type: "0",
+			children: [
+				{
+					id: "amap",
+					label: "高德",
+					visible: true,
+					type: "gdMap",
+					image: "http://10.1.102.189:8000/dyweb/static/img/mapBar/terrian.jpg",
+					url: "http://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}",
+				},
+			],
+		},
+    ],
+
+    businessLayers: [
+        {
+            name: 'wms2',
+            children: [
+                {
+                    name: 'wms1',
+                },
+            ],
+        },
+        {
+            name: 'wmts2',
+            children: [
+                {
+                    name: 'wmts1',
+                },
+            ],
+        },
+    ],
+
+    toolbar: [
+        {
+            label: '地图选择',
+            image: new URL(
+                './assets/image/toolbar/arrow.png',
+                import.meta.url
+            ).href,
+            key: 'pointer',
+            visible: true,
+        },
+        {
+            label: '放大',
+            image: new URL(
+                './assets/image/toolbar/zoomout.png',
+                import.meta.url
+            ).href,
+            key: 'zoomIn',
+            visible: true,
+        },
+        {
+            label: '缩小',
+            image: new URL(
+                './assets/image/toolbar/zoomin.png',
+                import.meta.url
+            ).href,
+            key: 'zoomOut',
+            visible: true,
+        },
+        {
+            label: '全图',
+            image: new URL(
+                './assets/image/toolbar/home.png',
+                import.meta.url
+            ).href,
+            key: 'fullExtent',
+            visible: true,
+        },
+        {
+            label: '行政区划',
+            image: new URL(
+                './assets/image/toolbar/localed.png',
+                import.meta.url
+            ).href,
+            key: 'xzq',
+            visible: false,
+        },
+        {
+            label: '图层',
+            image: new URL(
+                './assets/image/toolbar/layerC.png',
+                import.meta.url
+            ).href,
+            key: 'layer',
+            visible: true,
+        },
+        {
+            label: '搜索',
+            image: new URL(
+                './assets/image/toolbar/search123.png',
+                import.meta.url
+            ).href,
+            key: 'search',
+            hasChild: true,
+            visible: false,
+        },
+        {
+            label: '测距',
+            image: new URL(
+                './assets/image/toolbar/distance-new.png',
+                import.meta.url
+            ).href,
+            key: 'LineString',
+            visible: true,
+        },
+        {
+            label: '测面',
+            image: new URL(
+                './assets/image/toolbar/area-new.png',
+                import.meta.url
+            ).href,
+            key: 'Polygon',
+            visible: true,
+        },
+        {
+            label: '清除',
+            image: new URL(
+                './assets/image/toolbar/clear.png',
+                import.meta.url
+            ).href,
+            key: 'clear',
+            visible: true,
+        },
+        {
+            label: '绘制',
+            image: new URL(
+                './assets/image/toolbar/draw.png',
+                import.meta.url
+            ).href,
+            key: 'draw',
+            visible: true,
+        },
+    ],
+}
+
+export default mapConfig

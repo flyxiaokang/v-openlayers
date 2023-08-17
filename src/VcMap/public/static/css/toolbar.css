@@ -1,0 +1,33 @@
+
+/* 状态栏 */
+.map-status-bar {
+    display: flex;
+    justify-content: flex-end;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+    font-size: 14px;
+    /* font-weight: bold; */
+    border-radius: 5px;
+    background-color: #ebeef58c;
+    z-index: 1999;
+}
+
+.map-status-bar .el-card__body {
+    padding: 10px 10px 0px 20px !important;
+}
+
+.lat,
+.lon {
+    width: 160px;
+    white-space:nowrap; 
+}
+
+@media screen and (max-width: 1366px) {
+    .map-status-bar {
+        font-size: 12px;
+    }
+}
