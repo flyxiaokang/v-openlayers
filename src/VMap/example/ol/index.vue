@@ -2,9 +2,9 @@
  * @Description: 
  * @Version: 
  * @Author: kangjinrui
- * @Date: 2023-02-17 13:37:39
+ * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-29 13:48:38
+ * @LastEditTime: 2023-08-25 17:40:18
 -->
 <template>
   <div id="app-container">
@@ -56,6 +56,47 @@
         :cluster-options="clusterOptions"
         @select-change="handleSelectChange"
       />
+      <!-- 
+      <OlVector
+        :features="MultLinesJson"
+        :modifiable="checkStatus"
+        :style="lineStyle"
+        :z-index="104"
+        @select-change="handleSelectChange"
+      /> -->
+
+      <!-- <OlVector
+        :features="PolygonJson"
+        :modifiable="checkStatus"
+        :z-index="103"
+        :style="polygonStyle"
+        @select-change="handleSelectChange"
+      /> -->
+
+      <!-- <OlVector
+        :features="PointGeojson"
+        :modifiable="checkStatus"
+        :style="pointStyle"
+        :z-index="1000"
+        :cluster-options="clusterOptions"
+        @select-change="handleSelectChange"
+      /> -->
+
+      <!-- <OlVector
+        :features="PolylineGeojson"
+        :modifiable="checkStatus"
+        :style="lineStyle"
+        :z-index="104"
+        @select-change="handleSelectChange"
+      /> -->
+
+      <!-- <OlVector
+        :features="PolygonGeojson"
+        :modifiable="checkStatus"
+        :style="polygonStyle"
+        :z-index="103"
+        @select-change="handleSelectChange"
+      /> -->
 
       <!-- tdt -->
       <OlTile
@@ -65,6 +106,34 @@
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
+      />
+
+      <!-- <OlTile
+        map-provider="supermap"
+        :url="superMapWmtsUrl"
+        :request-params="requestParams"
+        :visible="checkVisible"
+        :opacity="opacity"
+        :min-zoom="3"
+        :max-zoom="10"
+      /> -->
+
+      <!-- <OlTile
+        map-provider="supermap"
+        :url="superMapWmtsUrlWebMocat"
+        :request-params="requestParams"
+        :visible="checkVisible"
+        :opacity="opacity"
+        :min-zoom="3"
+        :max-zoom="10"
+      /> -->
+
+      <OlTile
+        map-provider="wmts"
+        :url="wmtsUrl"
+        :request-params="requestParamsWmts"
+        :visible="checkVisible"
+        :opacity="opacity"
       />
 
       <OlTile
@@ -88,6 +157,35 @@ const checkStatus = ref(false)
 const checkVisible = ref(true)
 const opacity = ref(1)
 
+const tdtUrl = ref('http://t{s}.tianditu.gov.cn/img_w/wmts')
+
+const superMapWmtsUrl = ref(
+  'https://proxy.mwr.cn/usmaps/usmaps?k=MH9dDPhe3quZQTfDhacLpg==&urls=/mnt/usdata/2022_2m.usrmp&layer=4326&style=10&tilematrixset=l&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fwebpimage%2Fpngimage%2Fjpeg'
+)
+
+const superMapWmtsUrlWebMocat = ref('https://proxy.mwr.cn/usmaps/usmaps')
+
+const arcgisTileUrl = ref(
+  'https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/WMTS/tile'
+)
+
+const requestParams = reactive({
+  layer: 'wt',
+  tilematrixset: 'wt',
+  k: 'MH9dDPhe3quZQTfDhacLpg==',
+  urls: '/mnt/usdata/2022_2m.usrmp',
+  // style: 10,
+})
+
+const wmtsUrl = 'https://mrdata.usgs.gov/mapcache/wmts'
+const requestParamsWmts = reactive({
+  layer: 'sgmc2',
+  matrixSet: 'GoogleMapsCompatible',
+  format: 'image/png',
+  style: 'default',
+})
+
+
 const xyzUrl = ref('https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer')
 
 import MultLinesJson from '../data/wkt/multlines'
@@ -98,6 +196,8 @@ import VcUtils from '../../public/utils/base/index'
 import PolygonGeojson from '../data/geojson/polygon.json'
 import PolylineGeojson from '../data/geojson/polyline.json'
 import PointGeojson from '../data/geojson/point.json'
+// import Point2Geojson from '../data/geojson/point-cluster.json'
+console.log(PolygonGeojson)
 
 let olHandler = null
 const handleMapReady = (e) => {

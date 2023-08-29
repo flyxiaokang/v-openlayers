@@ -1,6 +1,6 @@
 
 /* 状态栏 */
-.vcmap-status-bar {
+.vmap-status-bar {
     display: flex;
     justify-content: flex-end;
     position: absolute;
@@ -16,7 +16,7 @@
     z-index: 1999;
 }
 
-.vcmap-status-bar .el-card__body {
+.vmap-status-bar .el-card__body {
     padding: 10px 10px 0px 20px !important;
 }
 
@@ -27,7 +27,7 @@
 }
 
 @media screen and (max-width: 1366px) {
-    .vcmap-status-bar {
+    .vmap-status-bar {
         font-size: 12px;
     }
 }

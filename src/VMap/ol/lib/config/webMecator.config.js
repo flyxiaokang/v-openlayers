@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:44:36
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-07-10 16:28:36
+ * @LastEditTime: 2023-08-29 14:28:23
  */
 import { V_MAP_TYPE_ENUM } from '@/VMap/global'
 
@@ -153,15 +153,15 @@ const mapConfig = {
       key: 'xzq',
       visible: false,
     },
-    {
-      label: '图层',
-      image: new URL(
-        '../../v3/assets/image/toolbar/layerC.png',
-        import.meta.url
-      ).href,
-      key: 'layer',
-      visible: true,
-    },
+    // {
+    //   label: '图层',
+    //   image: new URL(
+    //     '../../v3/assets/image/toolbar/layerC.png',
+    //     import.meta.url
+    //   ).href,
+    //   key: 'layer',
+    //   visible: true,
+    // },
     {
       label: '搜索',
       image: new URL(
@@ -191,13 +191,13 @@ const mapConfig = {
       key: 'Polygon',
       visible: true,
     },
-    {
-      label: '绘制',
-      image: new URL('../../v3/assets/image/toolbar/draw.png', import.meta.url)
-        .href,
-      key: 'draw',
-      visible: true,
-    },
+    // {
+    //   label: '绘制',
+    //   image: new URL('../../v3/assets/image/toolbar/draw.png', import.meta.url)
+    //     .href,
+    //   key: 'draw',
+    //   visible: true,
+    // },
     {
       label: '清除',
       image: new URL('../../v3/assets/image/toolbar/clear.png', import.meta.url)

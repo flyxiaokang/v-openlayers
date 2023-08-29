@@ -680,7 +680,7 @@ export default class LayerHandler {
     container,
     {
       autoPan = false,
-      className = 'vcmap-overlay-' + uuidOnlyStr(),
+      className = 'vmap-overlay-' + uuidOnlyStr(),
       positioning = 'center-right',
     }
   ) {

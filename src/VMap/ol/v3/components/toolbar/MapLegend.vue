@@ -7,7 +7,7 @@
  * @LastEditTime: 2023-07-10 15:49:22
 -->
 <template>
-  <el-card v-show="stationLegend.length > 0" class="vcmap-legend">
+  <el-card v-show="stationLegend.length > 0" class="vmap-legend">
     <div class="legend">
       <div
         v-for="(item, index) in stationLegend[0]"
@@ -108,7 +108,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.vcmap-legend {
+.vmap-legend {
   .legend {
     display: flex;
   }

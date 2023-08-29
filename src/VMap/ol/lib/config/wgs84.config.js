@@ -259,15 +259,15 @@ const mapConfig = {
       key: 'xzq',
       visible: false,
     },
-    {
-      label: '图层',
-      image: new URL(
-        '../../v3/assets/image/toolbar/layerC.png',
-        import.meta.url
-      ).href,
-      key: 'layer',
-      visible: true,
-    },
+    // {
+    //   label: '图层',
+    //   image: new URL(
+    //     '../../v3/assets/image/toolbar/layerC.png',
+    //     import.meta.url
+    //   ).href,
+    //   key: 'layer',
+    //   visible: true,
+    // },
     {
       label: '搜索',
       image: new URL(
@@ -297,13 +297,13 @@ const mapConfig = {
       key: 'Polygon',
       visible: true,
     },
-    {
-      label: '绘制',
-      image: new URL('../../v3/assets/image/toolbar/draw.png', import.meta.url)
-        .href,
-      key: 'draw',
-      visible: true,
-    },
+    // {
+    //   label: '绘制',
+    //   image: new URL('../../v3/assets/image/toolbar/draw.png', import.meta.url)
+    //     .href,
+    //   key: 'draw',
+    //   visible: true,
+    // },
     {
       label: '清除',
       image: new URL('../../v3/assets/image/toolbar/clear.png', import.meta.url)

@@ -8,7 +8,7 @@
 -->
 <template>
   <div v-show="false" :id="popupId" :class="getClass">
-    <div v-if="showTitle" class="vcmap-title">
+    <div v-if="showTitle" class="vmap-title">
       <span class="popup-title">{{ title }}</span>
       <span
         class="popup-close"
@@ -92,7 +92,7 @@ watch(position, () => {
 })
 
 const getClass = computed(() => {
-  return ['vcmap-ol-popup', theme.value]
+  return ['vmap-ol-popup', theme.value]
 })
 
 onMounted(() => {
@@ -112,7 +112,7 @@ const init = () => {
       offset: [0, 0],
       collection: false,
       options:{
-        className:'vcmap-overlay-top'
+        className:'vmap-overlay-top'
       }
     })
   }
@@ -145,7 +145,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.vcmap-ol-popup {
+.vmap-ol-popup {
   position: absolute;
   background-color: rgba(255, 255, 255, 0) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
@@ -155,7 +155,7 @@ onUnmounted(() => {
   min-width: 99px !important;
 }
 
-.vcmap-title {
+.vmap-title {
   width: 100%;
   height: 30px;
   line-height: 30px;
@@ -164,8 +164,8 @@ onUnmounted(() => {
   border-top-right-radius: 2px;
 }
 
-.vcmap-ol-popup:after,
-.vcmap-ol-popup:before {
+.vmap-ol-popup:after,
+.vmap-ol-popup:before {
   top: 100%;
   border: solid transparent;
   content: ' ';
@@ -175,21 +175,21 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-.vcmap-ol-popup.light:after {
+.vmap-ol-popup.light:after {
   border-top-color: white;
   border-width: 10px;
   left: 48px;
   margin-left: -10px;
 }
 
-.vcmap-ol-popup.dark:after {
+.vmap-ol-popup.dark:after {
   border-top-color: rgb(0, 0, 0, 0.5);
   border-width: 10px;
   left: 48px;
   margin-left: -10px;
 }
 
-.vcmap-ol-popup:before {
+.vmap-ol-popup:before {
   border-top-color: #cccccc;
   border-width: 11px;
   left: 48px;

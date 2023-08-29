@@ -4,12 +4,12 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-29 13:40:32
+ * @LastEditTime: 2023-08-29 14:26:04
 -->
 <template>
-  <div class="vcmap-container">
+  <div class="vmap-container">
     <!-- map -->
-    <div :id="target" class="vcmap-view" />
+    <div :id="target" class="vmap-view" />
     <slot name="popup"></slot>
     <slot></slot>
     <!-- 工具条 -->
@@ -80,7 +80,7 @@
     <!-- 绘制 -->
     <MapDraw
       v-if="showMapDraw"
-      class="vcmap-drawer"
+      class="vmap-drawer"
       @draw-change="handleDrawChange"
       @close="handleCloseDraw"
     />
@@ -118,7 +118,7 @@ import MapStatus from '@/VMap/public/components/Map/MapStatus.vue'
 import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
 
 import TableWidget from '@/VMap/public/components/Table/index.vue'
-// import Draggable from '@/VMap/components/Draggable/index.vue'
+import Draggable from '@/VMap/components/Draggable/index.vue'
 import { ref, toRefs, onMounted, computed, watch, reactive, provide } from 'vue'
 import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
 
@@ -221,7 +221,7 @@ const emits = defineEmits([
   'basemap-change',
 ])
 
-const target = `${uuidOnlyStr()}-vcmap-map`
+const target = `${uuidOnlyStr()}-vmap-map`
 
 let mapReady = false
 // 实时坐标
@@ -478,7 +478,7 @@ const object2Array = (properties) => {
 
 const toggleMap = (layerid) => {
   olInstance.toggleBaseLayer(layerid)
-  emit('basemap-change', layerid)
+  emits('basemap-change', layerid)
 }
 
 // 工具条
@@ -595,7 +595,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.vcmap-container {
+.vmap-container {
   width: 100%;
   height: 100%;
   position: relative;
@@ -606,7 +606,7 @@ export default {
   left: 50px;
   z-index: 3999;
 }
-.vcmap-view {
+.vmap-view {
   width: 100%;
   height: 100%;
   border-radius: 5px;
@@ -661,13 +661,13 @@ export default {
   border-bottom-width: 0;
 }
 
-.vcmap-drawer {
+.vmap-drawer {
   position: absolute;
   top: 20px;
   right: 80px;
 }
 
-.vcmap-overlay-top{
+.vmap-overlay-top{
   z-index: 9999;
 }
 

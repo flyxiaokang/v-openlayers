@@ -7,7 +7,7 @@
  * @LastEditTime: 2023-08-17 14:02:06
 -->
 <template>
-  <div class="vcmap-mapbar">
+  <div class="vmap-mapbar">
     <a class="active" @click="handleToggle">
       <!-- <icon-vc-toolbox/> -->
       <img class="toolbox" :src="toolboxSrc" title="工具箱" />
@@ -73,7 +73,7 @@ const handleClick = (item, index) => {
 }
 </script>
 <style scoped>
-.vcmap-mapbar {
+.vmap-mapbar {
   position: absolute;
   top: 70px;
   right: 17px;
@@ -82,18 +82,18 @@ const handleClick = (item, index) => {
   /* box-shadow: 2px 1px 3px #888888; */
 }
 
-.vcmap-mapbar a {
+.vmap-mapbar a {
   background-color: #fff;
   color: black;
   display: block;
   /* padding: 2px 1px; */
 }
 
-.vcmap-mapbar a:hover {
+.vmap-mapbar a:hover {
   background-color: #c5e8ff;
 }
 
-.vcmap-mapbar a.active {
+.vmap-mapbar a.active {
   /* background-color: #409eff; */
   color: white;
   border-radius: 5px;
@@ -104,22 +104,22 @@ const handleClick = (item, index) => {
   box-shadow: 2px 1px 3px #888888;
 }
 
-.vcmap-mapbar .toolbox {
+.vmap-mapbar .toolbox {
   width: 24px;
   height: 24px;
 }
 
-.vcmap-mapbar .navItem {
+.vmap-mapbar .navItem {
   width: 30px;
   height: 30px;
 }
 
-.vcmap-mapbar .active2 {
+.vmap-mapbar .active2 {
   background-color: #c5e8ff;
   /* color: white; */
 }
 
-.vcmap-mapbar .tool {
+.vmap-mapbar .tool {
   margin-top: 6px;
   box-shadow: 2px 1px 3px #888888;
   border-radius: 10px;

@@ -8,7 +8,7 @@
 -->
 
 <template>
-  <div class="vcmap-status-bar">
+  <div class="vmap-status-bar">
     <div class="lat" style="width: 150px; text-align: left">
       {{ parseLonLat[0] }}
     </div>

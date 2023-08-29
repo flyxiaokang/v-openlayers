@@ -4,12 +4,11 @@
  * @Author: kangjinrui
  * @Date: 2021-09-22 19:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-18 13:55:52
+ * @LastEditTime: 2023-08-29 14:24:09
 -->
 <template>
-  <div class="vcmap-base-layer">
-    <!-- <div class="layer-btn-vcmap" @mouseover="handleMouseover"></div> -->
-    <img class="vcmap-layer-btn2" :src="basemapSrc" alt="" @mouseover="handleMouseover">
+  <div class="vmap-base-layer">
+    <img class="vmap-layer-btn" :src="basemapSrc" alt="" @mouseover="handleMouseover">
     <transition name="fade" mode="out-in" appear>
       <div
         class="layers"
@@ -75,13 +74,13 @@ const handleToggleLayer = (layer, index) => {
 }
 </script>
 <style scoped>
-.vcmap-base-layer {
+.vmap-base-layer {
   position: absolute;
   top: 22px;
   right: 19px;
 }
 
-.layer-btn-vcmap {
+/* .layer-btn-vcmap {
   width: 34px;
   height: 34px;
   background-color: #eeeeee;
@@ -95,9 +94,9 @@ const handleToggleLayer = (layer, index) => {
   border: 2px solid #e6e6d900;
   box-shadow: 2px 1px 3px #888888;
   padding: 5px;
-}
+} */
 
-.vcmap-layer-btn2 {
+.vmap-layer-btn {
   width: 34px;
   height: 34px;
   background-color: white;
@@ -105,9 +104,6 @@ const handleToggleLayer = (layer, index) => {
   color: white;
   line-height: 35px;
   text-align: center;
-  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAvVJREFUeF7tWkFrE1EQ/qYbvUoSxQp6sGSrtAfxLIIgKPXqTcWbQjc0XvRsz9WLDdnSq6hHj4qCCGp/gkWyi3powVY3wbubkY0m7gZsd/e9xTw7e37zvZlv5s28fXwEjd+B5ofjVsm6DqbzQG8GoKpGeAUoDoCJdRC/Cn+ED78vnPw0ACMF1IRppeXfBvE9XXiF4jDd6dRr96M9tBBgVPADZn+ToExAv+wt62OhGSsIPAzDKWUCKiveXTAWC/KxWFjCojoBrv8G4LPFeloUOr3VQED72/h0+6xEcaCBAI+zbjtO64UA1WxUXKkAOQKqVfQv7aUHqLIvPUCa4H82BcquPwf05gh0AoxTIBxWPSbjbJ9ogtWW94gJV8fZYd2+DQkwvZnlJaZPQHXFbzDzg7wgJttRecU/Q8zvRoLYJOaGtb+0tn1jamunAE2vHCq3vBYRnGGQjI1O3T6WNqvmE+B6rwk49+eVlBqBU2vuHQJa3jYRDg0C7jh2puux8RUwGoAQIBUgR0B6QNoJEK2TJmj677BMgZEMyhiUMShjUMagjMEMDMg9QO4Bhj+Ly0VILkLJEs5+EzRcIqN+BAwXSSkTYLpMTpUA44WSqgT0H0VM0gkPLnkDqawOAowjIS6W1kVARIKRcnmdBGT4hci9VLe/pBswd2QpDXX7KwToZjRlInMv0+2vVIBuRnOnNqWhbn+lAnQzmjKRuZfp9pcqLe9LXAtY2mdN7qYLyu29BsMEAYytTt2eVIGNjsALABeGEhnmy0F9+qkKaFG2Zde/SeDVGP7LjmNfVNmPym57mUALMZDNjmMfVQEtyrbitgOAKsP/GXCz60w3VPajSBpL4GcJEMYGES1lEUupOLGT7cHVz0dCDk9Tr7cEYDa+lkGXuk7tucrev4SSBkpkifE4qNvXVIKPbI2VymZ9u/wbUUmxtAGSWSK6FczXllUzP2z6o0CRdBY9vgLCDBizcQ2hrk2z4DDjKwjvwVjHBD3pztfWstjvtvYnDdnMOGaAf7EAAAAASUVORK5CYII=);
-  background-repeat: no-repeat;
-  background-size: 96% 96%; */
   border: 2px solid #e6e6d900;
   box-shadow: 2px 1px 3px #888888;
   padding: 5px;
@@ -115,7 +111,7 @@ const handleToggleLayer = (layer, index) => {
 
 .layers {
   position: absolute;
-  right: 0px;
+  right: 40px;
   top: 0px;
   color: black;
   background-color: white;
