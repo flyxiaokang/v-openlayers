@@ -1,3 +1,11 @@
+/*
+ * @Description: 
+ * @Version: 
+ * @Author: kangjinrui
+ * @Date: 2023-08-17 11:35:37
+ * @LastEditors: kangjinrui
+ * @LastEditTime: 2023-08-28 15:39:33
+ */
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
@@ -44,7 +52,7 @@ export default defineConfig({
       // 自定义图标加载
       customCollections: {
         // 给svg文件设置fill="currentColor"属性，使图标的颜色具有适应性
-        vc: FileSystemIconLoader('src/VcMap/public/static/svg/vcMap', (svg) =>
+        vc: FileSystemIconLoader('src/VMap/public/static/svg/map', (svg) =>
           svg.replace(/^<svg /, '<svg fill="currentColor" ')
         ),
       },

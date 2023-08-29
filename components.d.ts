@@ -13,6 +13,8 @@ declare module '@vue/runtime-core' {
     IconIcBaseline3dRotation: typeof import('~icons/ic/baseline3d-rotation')['default']
     IconIcBaseline5g: typeof import('~icons/ic/baseline5g')['default']
     IconIcBaselineAirplanemodeActive: typeof import('~icons/ic/baseline-airplanemode-active')['default']
+    IconVcClean: typeof import('~icons/vc/clean')['default']
+    IconVcClose: typeof import('~icons/vc/close')['default']
     IconVcPoint: typeof import('~icons/vc/point')['default']
     IconVcPolygon: typeof import('~icons/vc/polygon')['default']
     IconVcPolyline: typeof import('~icons/vc/polyline')['default']

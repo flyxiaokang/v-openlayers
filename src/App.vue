@@ -1,6 +1,14 @@
+<!--
+ * @Description: 
+ * @Version: 
+ * @Author: kangjinrui
+ * @Date: 2023-08-17 11:35:37
+ * @LastEditors: kangjinrui
+ * @LastEditTime: 2023-08-28 15:37:45
+-->
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
-import Example from './VcMap/example/ol/index.vue'
+import Example from './VMap/example/ol/index.vue'
 </script>
 
 <template>
