@@ -4,35 +4,49 @@
  * @Author: kangjinrui
  * @Date: 2022-04-19 14:32:40
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-18 13:59:12
+ * @LastEditTime: 2023-09-04 15:53:26
 -->
 
 <template>
   <div class="vmap-status-bar">
-    <div class="lat" style="width: 150px; text-align: left">
-      {{ parseLonLat[0] }}
+    <div
+      class="item"
+      style="
+        display: flex;
+        justify-content: space-around;
+        width: 280px;
+      "
+    >
+      <span>{{ parseLonLat[0] }}</span>
+      <span>{{ parseLonLat[1] }}</span>
     </div>
-    <div class="lon" style="width: 150px">
-      {{ parseLonLat[1] }}
+    <div class="item">
+      地图级别
+      {{ parseInt(zoom) }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-// import VcUtils from '../../utils/base'
+import { ref, computed, inject, onMounted, nextTick } from 'vue'
+
+const olHandler = inject('olHandler')
 
 const props = defineProps({
-  latlon: {
+  position: {
     type: Array,
     default() {
       return [-1, -1]
     },
   },
+  zoom: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const parseLonLat = computed(() => {
-  let [lon, lat] = props.latlon
+  let [lon, lat] = props.position
   let labelX = 'X '
   let labelY = 'Y '
   let unit = '米'
@@ -45,11 +59,6 @@ const parseLonLat = computed(() => {
     labelX + parseFloat(lon).toFixed(4) + unit,
     labelY + parseFloat(lat).toFixed(4) + unit,
   ]
-  // if (VcUtils.isString(lon) || VcUtils.isString(lat)) {
-
-  // } else {
-  //     return [labelX + lon.toFixed(4) + unit, labelY + lat.toFixed(4) + unit];
-  // }
 })
 </script>
 

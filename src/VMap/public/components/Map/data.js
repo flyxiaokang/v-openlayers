@@ -58,12 +58,12 @@ export const layerTreeData = [{
     }]
 }, {
     id: '3',
-    label: 'arcgistile',
+    label: 'arcgisimagetile',
     children: [{
         id: '3-1',
-        label: 'arcgistile',
+        label: 'arcgisimagetile',
         url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer',
-        serverType: 'arcgistile'
+        serverType: 'arcgisimagetile'
     }]
 }, {
     id: '4',

@@ -27,10 +27,6 @@ const olHandler = inject('olHandler')
 
 const props = defineProps({
   ...useProps,
-  layerId: {
-    type: String,
-    default: '',
-  },
   source: {
     type: Object,
     default() {

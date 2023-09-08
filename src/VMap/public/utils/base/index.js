@@ -11,12 +11,14 @@ import * as TypeCheckUtils from './type'
 import * as Validate from './validate'
 import * as Common from './common'
 import * as DateFormat from './date'
+import * as StringUtils from './string'
 
 const VcUtils = {
   ...Utils,
   ...TypeCheckUtils,
   ...Validate,
   ...Common,
+  ...StringUtils,
   Date: {
     ...DateFormat,
   },

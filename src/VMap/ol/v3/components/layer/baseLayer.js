@@ -14,6 +14,10 @@ export const useProps = {
     type: String,
     default: 'layer',
   },
+  layerId: {
+    type: String,
+    default: '',
+  },
   visible: {
     type: Boolean,
     default: true,

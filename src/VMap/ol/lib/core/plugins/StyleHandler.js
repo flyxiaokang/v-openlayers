@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-10 15:42:18
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-23 16:31:05
+ * @LastEditTime: 2023-09-05 22:16:26
  */
 import {
   Style,
@@ -70,7 +70,6 @@ function getStorke({
   lineDash = [0, 0],
   zIndex,
 } = {}) {
-  console.log('????????',width)
   return new Stroke({
     color,
     width: width,
@@ -127,7 +126,6 @@ export function getStyle(options = {}) {
       pointStyle.setText(text)
       return pointStyle
     } catch (error) {
-      console.error(error)
       return null
     }
   }
@@ -154,10 +152,10 @@ export function getStyle(options = {}) {
 }
 
 export function getIconStyle() {
-  console.log(
-    'aaa',
-    new URL('../../../../public/static/svg/map/close.svg', import.meta.url).href
-  )
+  // console.log(
+  //   'aaa',
+  //   new URL('../../../../public/static/svg/map/close.svg', import.meta.url).href
+  // )
   const aaa = new URL(
     '../../../../public/static/svg/map/split-point.svg',
     import.meta.url

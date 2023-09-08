@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-12-27 14:28:14
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-24 16:17:38
+ * @LastEditTime: 2023-09-04 15:49:38
  */
 import Base from './Base'
 import 'ol/ol.css'
@@ -190,7 +190,7 @@ class VMap extends Base {
       logo: false,
       controls: defaults({
         attribution: false,
-        zoom: true,
+        zoom: false,
         rotate: false,
         scaleLine: true,
         ...controls,
@@ -203,6 +203,10 @@ class VMap extends Base {
     this.map.addControl(
       new ScaleLine({
         units: 'metric',
+        bar: true,
+        steps: 2,
+        text:true,
+        minWidth: 140,
       })
     )
     this.layerHandler.setMap(this.map)
@@ -420,7 +424,7 @@ class VMap extends Base {
    * @returns
    */
   getLayerByType(options, prj = getConfig().prj) {
-    console.log(options)
+    // console.log(options)
     switch (options.type) {
       case V_MAP_TYPE_ENUM.wmts:
         return this.layerHandler.getWmtsByPrj({
@@ -441,15 +445,15 @@ class VMap extends Base {
         return this.layerHandler.getWmtsGeoserver({
           options,
         })
-      case V_MAP_TYPE_ENUM.wms:
+      case V_MAP_TYPE_ENUM.wmsimagetile:
         return this.layerHandler.getWmsTile(options)
       case V_MAP_TYPE_ENUM.wmsimage:
         return this.layerHandler.getWmsImage(options)
       case V_MAP_TYPE_ENUM.arcgisimage:
         return this.layerHandler.getArcgisImage(options)
-      case V_MAP_TYPE_ENUM.arcgistile:
+      case V_MAP_TYPE_ENUM.arcgisimagetile:
         return this.layerHandler.getArcgisImageTile(options)
-      case V_MAP_TYPE_ENUM.arcgiswmts:
+      case V_MAP_TYPE_ENUM.arcgistile:
         return this.layerHandler.getXYZ(options)
       case V_MAP_TYPE_ENUM.geojson:
         return this.layerHandler.getGeojsonLayerWithRender(options)

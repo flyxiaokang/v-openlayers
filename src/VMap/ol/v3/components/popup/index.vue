@@ -1,54 +1,71 @@
+<!--
+ * @Description: overlay
+ * @Version: 
+ * @Author: kangjinrui
+ * @Date: 2023-06-16 20:11:12
+ * @LastEditors: kangjinrui
+ * @LastEditTime: 2023-09-07 14:03:54
+-->
 <template>
-  <div :id="popupId" class="ol-popup">
-    <div v-if="showTitle" class="popup_title_div">
-      <span id="popup-title" class="ol-popup-title">{{ title }}</span>
+  <div v-show="visible" :id="popupId" :class="getClass">
+    <div v-if="showTitle" class="vmap-title">
+      <span class="popup-title">{{ title }}</span>
       <span
-        id="popup-closer"
-        class="ol-popup-closer"
+        class="popup-title-close"
         @click="handleClose"
       ></span>
     </div>
-    <!-- <div :id="contentId" class="popup-content" v-html="contentHtml"> -->
-    <div :id="contentId" class="popup-content">
+    <div :id="contentId" class="vmap-popup-content">
       <slot></slot>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue'
+import {
+  ref,
+  toRefs,
+  onMounted,
+  computed,
+  watch,
+  reactive,
+  provide,
+  inject,
+  nextTick,
+  onUnmounted,
+} from 'vue'
+
+import { V_MAP_THEME } from '@/VMap/global'
 
 const props = defineProps({
-  popupId: {
-    require: true,
+  theme: {
     type: String,
-    default: '',
+    default: V_MAP_THEME.dark,
+  },
+  visible:{
+    type:Boolean,
+    default:false
   },
   showTitle: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   title: {
     type: String,
     default: '标题',
   },
-  content: {
-    type: Object,
-    default() {
-      return {}
-    },
+  popupId: {
+    require: true,
+    type: String,
+    default: '',
   },
   contentHtml: {
     type: String,
     default: '',
   },
 })
-
-const { popupId } = toRefs(props)
-
+const { theme, popupId } = toRefs(props)
 const emits = defineEmits(['on-close'])
-
-let containerId = 'ol_popup_' + Math.random().toFixed(6)
 
 let contentId = ref(popupId.value + '_content')
 
@@ -56,32 +73,33 @@ const handleClose = () => {
   emits('on-close')
 }
 
-const getHtml = (data) => {
-  let html = '<div>'
-  data.forEach((element) => {
-    const { value, label } = element
-    html += `<div style="display:flex;padding:5px;"><div style="width:70px;text-align:center;">${label}：</div><div style="width:auto;text-align:left;">${value}</div></div>`
-  })
+const getClass = computed(() => {
+  return ['vmap-ol-popup', theme.value]
+})
 
-  html += '</div>'
-  return html
-}
+
+
+onMounted(() => {
+  nextTick((e) => {
+  })
+})
+
+onUnmounted(() => {
+})
 </script>
 
 <style lang="scss" scoped>
-.ol-popup {
+.vmap-ol-popup {
   position: absolute;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  /* padding: 15px; */
-  border-radius: 10px;
   border: 1px solid #cccccc;
   bottom: 12px;
   left: -50px;
-  min-width: 150px;
+  min-width: 99px !important;
 }
 
-.popup_title_div {
+.vmap-title {
   width: 100%;
   height: 30px;
   line-height: 30px;
@@ -90,8 +108,8 @@ const getHtml = (data) => {
   border-top-right-radius: 2px;
 }
 
-.ol-popup:after,
-.ol-popup:before {
+.vmap-ol-popup:after,
+.vmap-ol-popup:before {
   top: 100%;
   border: solid transparent;
   content: ' ';
@@ -101,21 +119,42 @@ const getHtml = (data) => {
   pointer-events: none;
 }
 
-.ol-popup:after {
+.vmap-ol-popup.light:after {
   border-top-color: white;
   border-width: 10px;
   left: 48px;
   margin-left: -10px;
 }
 
-.ol-popup:before {
+.vmap-ol-popup.dark:after {
+  border-top-color: rgb(0, 0, 0, 0.5);
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+
+.vmap-ol-popup:before {
   border-top-color: #cccccc;
   border-width: 11px;
   left: 48px;
   margin-left: -11px;
 }
 
-.ol-popup-closer {
+
+
+.popup-title-close:after {
+  content: '✖';
+}
+
+.popup-title {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  top: 0px;
+  left: 8px;
+}
+
+.popup-title-close {
   text-decoration: none;
   position: absolute;
   top: 2px;
@@ -125,20 +164,22 @@ const getHtml = (data) => {
   cursor: pointer;
 }
 
-.ol-popup-closer:after {
-  content: '✖';
-}
-
-.ol-popup-title {
-  position: absolute;
-  color: white;
-  font-weight: bold;
-  top: 0px;
-  left: 8px;
-}
-
-.popup-content {
-  padding: 10px;
+.light .vmap-popup-content {
   background-color: white;
+  color: black;
+}
+
+.dark .vmap-popup-content {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.vmap-popup-content {
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  // max-height: 300px;
+  // overflow-y: auto;
 }
 </style>

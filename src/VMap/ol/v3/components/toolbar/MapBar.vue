@@ -4,13 +4,12 @@
  * @Author: kangjinrui
  * @Date: 2021-09-22 14:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-17 14:02:06
+ * @LastEditTime: 2023-09-04 14:39:56
 -->
 <template>
-  <div class="vmap-mapbar">
+  <div class="vmap-mapbar" :style="getStyle">
     <a class="active" @click="handleToggle">
-      <!-- <icon-vc-toolbox/> -->
-      <img class="toolbox" :src="toolboxSrc" title="工具箱" />
+      <icon-vc-toolbox />
     </a>
     <transition name="el-zoom-in-top">
       <div v-show="!isCollapse" class="tool">
@@ -29,57 +28,100 @@
 
 <script setup>
 import { getConfig } from '@/VMap/ol/config'
-import { onMounted, ref, toRefs, watch } from 'vue'
+import { onMounted, ref, toRefs, watch, inject } from 'vue'
+import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
+import { useProps, useEmits, usePosition } from './baseBar'
 
-import toolboxSrc from '../../assets/image/toolbar/toolbox.png'
+const olHandler = inject('olHandler')
 
 const props = defineProps({
-  toolIndex: {
-    type: Number,
-    default: -1,
+  ...useProps,
+  offset: {
+    type: Array,
+    default() {
+      return [0, 50]
+    },
   },
 })
+const emits = defineEmits([...useEmits])
 
-const emits = defineEmits(['on-change'])
-
-let isCollapse = ref(false)
-let menus = ref([])
-
-const { toolIndex } = toRefs(props)
-let curToolIndex = props.toolIndex
-
-watch(toolIndex, (nv, ov) => {
-  if (toolIndex !== 6) {
-    curToolIndex = toolIndex
-  }
+const getPosition = usePosition(toRefs(props))
+const getStyle = ref({
+  ...getPosition.value,
+  width: '36px',
+  'text-align': 'center',
 })
 
+let menus = ref([])
 onMounted(() => {
   menus.value = getConfig().toolbar.filter((e) => e.visible)
 })
 
+let isCollapse = ref(false)
 const handleToggle = () => {
   isCollapse.value = !isCollapse.value
 }
 
+const curToolIndex = ref(-1)
 const handleClick = (item, index) => {
   if (index !== 6) {
-    curToolIndex = index
+    curToolIndex.value = index
   } else {
-    curToolIndex = -1
+    curToolIndex.value = -1
   }
   const { key, handler } = item
-  emits('on-change', { key, handler: handler }, index)
+  handleMapTool({ key, handler: handler }, index)
+}
+
+const handleMapTool = (item, index) => {
+  const { key, handler } = item
+  if (handler) {
+    emits('change', handler)
+    return
+  }
+  switch (key) {
+    case 'fullExtent':
+      olHandler.fullExtent()
+      break
+    case 'zoomIn':
+      olHandler.dragZoom(false)
+      break
+    case 'zoomOut':
+      olHandler.dragZoom(true)
+      break
+    case 'pointer':
+      olHandler.endDragZoom()
+      olHandler.map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
+      break
+    case 'LineString': // 测距
+      olHandler.getMeasureHandler().measureLength()
+      break
+    case 'Polygon': // 测面
+      olHandler.getMeasureHandler().measureArea()
+      break
+    case 'clear':
+      olHandler.getMeasureHandler().clearResult()
+      break
+    case 'xzq':
+      break
+    case 'layer':
+      break
+    case 'locate':
+      break
+    case 'draw':
+      break
+    default:
+      break
+  }
 }
 </script>
 <style scoped>
 .vmap-mapbar {
-  position: absolute;
+  /* position: absolute;
   top: 70px;
   right: 17px;
   width: 36px;
-  text-align: center;
-  /* box-shadow: 2px 1px 3px #888888; */
+  text-align: center; */
 }
 
 .vmap-mapbar a {

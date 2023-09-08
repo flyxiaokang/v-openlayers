@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:23:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-25 17:43:17
+ * @LastEditTime: 2023-09-04 22:55:14
  */
 
 // import 'ol/ol.css'
@@ -358,8 +358,7 @@ export default class LayerHandler {
 
   getWmsTile(options) {
     return new TileLayer({
-      id: options.id,
-      visible: options.visible,
+      ...getLayerParams(options),
       source: new TileWMS({
         url: options.url.split('?')[0],
         params: CustomUtils.parasUrlParams2Obj(options.url),
@@ -369,8 +368,7 @@ export default class LayerHandler {
 
   getWmsImage(options) {
     return new ImageLayer({
-      id: options.id,
-      visible: options.visible,
+      ...getLayerParams(options),
       source: new ImageWMS({
         url: options.url.split('?')[0],
         params: CustomUtils.parasUrlParams2Obj(options.url),
@@ -390,8 +388,7 @@ export default class LayerHandler {
 
   getArcgisImageTile(options) {
     return new TileLayer({
-      id: options.id,
-      visible: options.visible,
+      ...getLayerParams(options),
       source: new TileArcGISRest({
         url: options.url,
       }),
@@ -679,10 +676,10 @@ export default class LayerHandler {
   getOverlayLayer(
     container,
     {
-      autoPan = false,
+      autoPan = true,
       className = 'vmap-overlay-' + uuidOnlyStr(),
       positioning = 'center-right',
-    }
+    } = {}
   ) {
     const overlay = new Overlay({
       element: container,

@@ -4,14 +4,18 @@
  * @Author: kangjinrui
  * @Date: 2021-09-22 19:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-29 14:24:09
+ * @LastEditTime: 2023-09-04 14:38:53
 -->
 <template>
-  <div class="vmap-base-layer">
-    <img class="vmap-layer-btn" :src="basemapSrc" alt="" @mouseover="handleMouseover">
+  <div class="vmap-base-layer" :style="getStyle">
+    <img
+      class="vmap-layer-btn"
+      :src="basemapSrc"
+      @mouseover="handleMouseover"
+    />
     <transition name="fade" mode="out-in" appear>
       <div
-        class="layers"
+        class="vmap-layers"
         v-show="showLayers"
         @mouseleave="showLayers = false"
       >
@@ -44,10 +48,18 @@
 
 <script setup>
 import { getConfig } from '@/VMap/ol/config'
-import { ref } from 'vue'
+import { ref, toRefs, computed, inject } from 'vue'
 import basemapSrc from '../../assets/image/toolbar/basemap.png'
+import { useProps, useEmits, usePosition } from './baseBar'
 
-const emits = defineEmits(['on-toggle'])
+const olHandler = inject('olHandler')
+
+const props = defineProps({
+  ...useProps,
+})
+const emits = defineEmits(['change'])
+
+const getStyle = usePosition(toRefs(props))
 
 let defaultId = getConfig().defaultBaseMapId
 let curLayerIndex = ref(defaultId)
@@ -70,14 +82,19 @@ const handleToggleLayer = (layer, index) => {
     ids.push(layer.id)
   }
   curLayerIndex.value = index
-  emits('on-toggle', ids)
+  toggleMap(ids)
+}
+
+const toggleMap = (layerid) => {
+  olHandler.toggleBaseLayer(layerid)
+  emits('change', layerid)
 }
 </script>
 <style scoped>
 .vmap-base-layer {
-  position: absolute;
+  /* position: absolute;
   top: 22px;
-  right: 19px;
+  right: 19px; */
 }
 
 /* .layer-btn-vcmap {
@@ -97,8 +114,8 @@ const handleToggleLayer = (layer, index) => {
 } */
 
 .vmap-layer-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   background-color: white;
   border-radius: 5px;
   color: white;
@@ -109,7 +126,7 @@ const handleToggleLayer = (layer, index) => {
   padding: 5px;
 }
 
-.layers {
+.vmap-layers {
   position: absolute;
   right: 40px;
   top: 0px;
@@ -120,32 +137,32 @@ const handleToggleLayer = (layer, index) => {
   box-shadow: 5px 5px 8px 1px rgba(0, 0, 0, 0.3);
 }
 
-.layers .item {
+.vmap-layers .item {
   width: 100%;
 }
 
-.layers .image {
+.vmap-layers .image {
   display: flex;
 }
 
-.layers .image-2 {
+.vmap-layers .image-2 {
   display: flex;
 }
 
-.layers img {
+.vmap-layers img {
   width: 50px;
   height: 50px;
   margin: 5px;
   border: 4px solid #dddddd;
 }
 
-.layers img:hover {
+.vmap-layers img:hover {
   background-color: aliceblue;
   /* border: 0px solid #dddddd; */
   cursor: pointer;
 }
 
-.layers .active {
+.vmap-layers .active {
   /* border: 0px solid #dddddd; */
   cursor: pointer;
   box-shadow: 0px 0px 0px 2px #409eff;

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-29 14:26:04
+ * @LastEditTime: 2023-09-05 22:38:56
 -->
 <template>
   <div class="vmap-container">
@@ -12,16 +12,8 @@
     <div :id="target" class="vmap-view" />
     <slot name="popup"></slot>
     <slot></slot>
-    <!-- 工具条 -->
-    <MapBar
-      v-if="showToolbar"
-      :tool-index="curToolIndex"
-      @on-change="handleMapTool"
-    />
     <!-- 地图状态条 -->
-    <MapStatus v-if="showStatusbar" :latlon="latlon" />
-    <!-- 底图 -->
-    <MapBaseLayer v-if="showBasemapbar" @on-toggle="toggleMap" />
+    <MapStatus v-if="showStatusbar" :position="position" :zoom="curZoom"/>
     <!-- popup -->
     <MapPopup
       v-show="showFeaturePopupLocal"
@@ -31,9 +23,9 @@
       @on-close="handleClosePopup"
     >
       <TableWidget
-        style="height: 300px"
-        :table-header="singlePopupConfig.tableHeader"
-        :table-data="singlePopupConfig.tableData"
+        :style="{ height: singlePopupTableHeight + 'px' }"
+        :table-header="singlePopupTableHeader"
+        :table-data="featureTableData"
       />
     </MapPopup>
     <!-- multiple popup -->
@@ -45,8 +37,8 @@
         :show-title="false"
       >
         <TableWidget
-          style="height: 160px"
-          :table-header="multiplePopupConfig.tableHeader"
+          :style="{ height: multiplePopupTableHeight + 'px' }"
+          :table-header="multiplePopupTableHeader"
           :table-data="item.attributes"
         />
       </MapPopup>
@@ -70,8 +62,8 @@
           :key="index"
         >
           <TableWidget
-            style="height: 300px"
-            :table-header="singlePopupConfig.tableHeader"
+            :style="{ height: singlePopupTableHeight + 'px' }"
+            :table-header="singlePopupTableHeader"
             :table-data="item.attributes"
           />
         </el-tab-pane>
@@ -105,25 +97,21 @@
 </template>
 
 <script setup>
+import { ref, toRefs, onMounted, computed, watch, reactive, provide } from 'vue'
 import { getOlHandler } from '@/VMap/ol/init'
 import { setConfig, getConfig } from '@/VMap/ol/config'
-import { uuidOnlyStr } from '@/VMap/public/utils/base/string'
-import VcUtils from '@/VMap/public/utils/base'
+import VUtils from '@/VMap/public/utils/base'
 
-import MapBar from './toolbar/MapBar.vue'
-import MapBaseLayer from './toolbar/MapBaseLayer.vue'
 import MapPopup from './popup/index.vue'
 // import MapLayerManager from '@/VMap/public/components/Map/MapLayerManager.vue'
 import MapStatus from '@/VMap/public/components/Map/MapStatus.vue'
 import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
 
-import TableWidget from '@/VMap/public/components/Table/index.vue'
+import TableWidget from '@/VMap/components/Table/index.vue'
 import Draggable from '@/VMap/components/Draggable/index.vue'
-import { ref, toRefs, onMounted, computed, watch, reactive, provide } from 'vue'
 import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
 
 const olInstance = getOlHandler()
-
 provide('olHandler', olInstance)
 
 const props = defineProps({
@@ -133,61 +121,98 @@ const props = defineProps({
       return getConfig()
     },
   },
-
   showFeaturePopup: {
     type: Boolean,
     default: false,
   },
-
+  singlePopupTableHeight: {
+    type: Number,
+    default: 300,
+  },
+  singlePopupTableHeader: {
+    type: Array,
+    default() {
+      return [
+        {
+          label: '属性',
+          value: 'label',
+        },
+        {
+          label: '值',
+          value: 'value',
+          width: 100,
+        },
+      ]
+    },
+  },
+  multiplePopupTableHeight:{
+    type: Number,
+    default: 200,
+  },
+  multiplePopupTableHeader:{
+    type:Array,
+    default(){
+      return [
+          {
+            label: '属性',
+            value: 'label',
+          },
+          {
+            label: '值',
+            value: 'value',
+            width: 100,
+          },
+        ]
+    }
+  },
+  multiplePopupConfig: {
+    type: Object,
+    default() {
+      return {
+        tableHeight: 180,
+      }
+    },
+  },
   featurePopupTitle: {
     type: String,
     default: '标题',
   },
-
   featurePopup: {
     type: Object,
     default() {
       return {}
     },
   },
-
   showMultiplePopup: {
     type: Boolean,
     default: false,
   },
-
   multiplePopup: {
     type: Array,
     default() {
       return []
     },
   },
-
   identify: {
     type: Boolean,
     default: false,
   },
-
   showIcons: {
     type: Boolean,
     default: false,
   },
-
   showToolbar: {
     type: Boolean,
     default: false,
   },
-
   showBasemapbar: {
     type: Boolean,
     default: false,
   },
-
   showStatusbar: {
     type: Boolean,
     default: true,
   },
-
   controls: {
     type: Object,
     default() {
@@ -217,19 +242,14 @@ const emits = defineEmits([
   'mouse-dbclick',
   'mouse-moveend',
   'draw-end',
-  'tool-change',
-  'basemap-change',
 ])
 
-const target = `${uuidOnlyStr()}-vmap-map`
-
+const target = `${VUtils.uuidOnlyStr()}-vmap-id`
 let mapReady = false
 // 实时坐标
-let latlon = ref([0, 0])
+let position = ref([0, 0])
 
-let curToolIndex = -1
 let layerManagerVisible = ref(false)
-
 let showFeaturePopupLocal = ref(false)
 let showMultiplePopupLocal = ref(false)
 let overlay = null
@@ -237,44 +257,13 @@ const popupId = 'ol-custom-popup-id'
 const popupsId = 'ol-custom-popups-id'
 let attributeOverlay = null
 let popupContentHtml = ''
-const popupContent = ''
 const popupPrefix = 'm-custom-popup-'
-const multiplePopupReady = true
-const updatePopups = false
 
 let showIdentify = ref(false)
 let activeIdentify = ref('')
 let identifyList = ref([])
 
-let singlePopupConfig = reactive({
-  tableHeader: [
-    {
-      label: '属性',
-      value: 'label',
-    },
-    {
-      label: '值',
-      value: 'value',
-      width: 100,
-    },
-  ],
-  tableData: [],
-})
-
-let multiplePopupConfig = reactive({
-  tableHeader: [
-    {
-      label: '属性',
-      value: 'label',
-      width: 80,
-    },
-    {
-      label: '值',
-      value: 'value',
-      width: 80,
-    },
-  ],
-})
+const featureTableData = ref([])
 
 const computePopups = computed(() => {
   return multiplePopup.value.map((e) => {
@@ -284,7 +273,6 @@ const computePopups = computed(() => {
     }
   })
 })
-
 watch(
   featurePopup,
   (nv, ov) => {
@@ -338,12 +326,14 @@ const defaultCheckLayerIds = ref([])
 let showMapDraw = ref(false)
 setConfig(mapConfig.value)
 
+const curZoom = ref(0)
 onMounted(() => {
   olInstance.target = target
   olInstance.initMap((map) => {
     mapReady = true
     map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
     emits('ready', olInstance)
+    curZoom.value = map.getView().getZoom()
     bindEvent()
   }, controls.value)
 })
@@ -351,7 +341,7 @@ onMounted(() => {
 // 事件
 const bindEvent = () => {
   olInstance.registerMouseMove((e) => {
-    latlon.value = [e.coordinate[0].toFixed(4), e.coordinate[1].toFixed(4)]
+    position.value = [e.coordinate[0].toFixed(4), e.coordinate[1].toFixed(4)]
     emits('mouse-move', e)
   })
 
@@ -368,6 +358,7 @@ const bindEvent = () => {
 
   olInstance.registerMouseMoveEnd((e) => {
     emits('mouse-moveend', e)
+    curZoom.value = olInstance.map.getView().getZoom()
   })
 }
 
@@ -385,7 +376,7 @@ const handleIdentify = (e) => {
     identifyList.value.push({
       name: '要素_' + (index + 1),
       location: coordinate,
-      attributes: VcUtils.object2Array(feature.getProperties()),
+      attributes: VUtils.object2Array(feature.getProperties()),
     })
   })
 }
@@ -417,7 +408,7 @@ const openFeaturePopup = (location, attributes) => {
     offset: [0, 0],
     collection: false,
   })
-  singlePopupConfig.tableData = attributes
+  featureTableData.value = attributes
   showFeaturePopupLocal.value = true
 }
 
@@ -476,68 +467,6 @@ const object2Array = (properties) => {
   return attributes
 }
 
-const toggleMap = (layerid) => {
-  olInstance.toggleBaseLayer(layerid)
-  emits('basemap-change', layerid)
-}
-
-// 工具条
-const handleMapTool = (item, index) => {
-  curToolIndex = index
-  const { key, handler } = item
-  if (handler) {
-    emits('tool-change', handler)
-    return
-  }
-  const { map } = olInstance
-  switch (key) {
-    case 'fullExtent':
-      olInstance.fullExtent()
-      break
-    case 'zoomIn':
-      olInstance.dragZoom(false)
-      break
-    case 'zoomOut':
-      olInstance.dragZoom(true)
-      break
-    case 'pointer':
-      olInstance.endDragZoom()
-      map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
-      break
-    case 'LineString': // 测距
-      olInstance.getMeasureHandler().measureLength()
-      break
-    case 'xzq':
-      showXzqPanel = !showXzqPanel
-      break
-    case 'Polygon': // 测面
-      olInstance.getMeasureHandler().measureArea()
-      break
-    case 'layer':
-      layerManagerVisible.value = true
-      break
-    case 'locate':
-      showMapLocateWindow = !showMapLocateWindow
-      break
-    case 'clear':
-      olInstance.getMeasureHandler().clearResult()
-      handleClearMap()
-      break
-    case 'draw':
-      showMapDraw.value = true
-      break
-    default:
-      break
-  }
-}
-
-const handleClearMap = () => {}
-
-const handleCloseTool = () => {
-  curToolIndex = -1
-  layerManagerVisible.value = false
-}
-
 const handleCheckChange = (item, checked, indeterminate) => {
   // console.log(item, checked, indeterminate);
   if (
@@ -547,18 +476,18 @@ const handleCheckChange = (item, checked, indeterminate) => {
   ) {
     // all
     let list = []
-    VcUtils.tree2list(item.children, list)
+    VUtils.tree2list(item.children, list)
     list.forEach((layer) => {
       let { id } = layer
       layer['visible'] = checked
       // console.log("all", layer.id);
-      VcUtils.pushNoReapeat(defaultCheckLayerIds.value, id, checked)
+      VUtils.pushNoReapeat(defaultCheckLayerIds.value, id, checked)
       olInstance.addLayerByType({ ...layer, visible: checked })
     })
   } else if (!item.hasOwnProperty('children') && !indeterminate) {
     // single
     // console.log("single", item.id);
-    VcUtils.pushNoReapeat(defaultCheckLayerIds.value, item.id, checked)
+    VUtils.pushNoReapeat(defaultCheckLayerIds.value, item.id, checked)
     olInstance.addLayerByType({ ...item, visible: checked })
   }
 }
@@ -597,7 +526,7 @@ export default {
 <style lang="scss" scoped>
 .vmap-container {
   width: 100%;
-  height: 100%;
+  // height: 100%;
   position: relative;
 }
 .custom-icon-container {
@@ -667,7 +596,7 @@ export default {
   right: 80px;
 }
 
-.vmap-overlay-top{
+.vmap-overlay-top {
   z-index: 9999;
 }
 

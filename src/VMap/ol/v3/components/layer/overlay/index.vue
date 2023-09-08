@@ -4,18 +4,18 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:11:12
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-21 16:34:35
+ * @LastEditTime: 2023-09-07 09:52:00
 -->
 <template>
   <div v-show="false" :id="popupId" :class="getClass">
     <div v-if="showTitle" class="vmap-title">
       <span class="popup-title">{{ title }}</span>
       <span
-        class="popup-close"
+        class="popup-title-close"
         @click="handleClose"
       ></span>
     </div>
-    <div :id="contentId" class="popup-content">
+    <div :id="contentId" class="vmap-popup-content">
       <slot></slot>
     </div>
   </div>
@@ -36,18 +36,14 @@ import {
   onUnmounted,
 } from 'vue'
 
-const THEME_ENUM = {
-  normal: 1,
-  light: 2,
-  dark: 3,
-}
+import { V_MAP_THEME } from '@/VMap/global'
 
 const olHandler = inject('olHandler')
 
 const props = defineProps({
   theme: {
     type: String,
-    default: 'dark',
+    default: V_MAP_THEME.dark,
   },
   showTitle: {
     type: Boolean,
@@ -196,17 +192,9 @@ onUnmounted(() => {
   margin-left: -11px;
 }
 
-.popup-close {
-  text-decoration: none;
-  position: absolute;
-  top: 2px;
-  right: 8px;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
 
-.popup-close:after {
+
+.popup-title-close:after {
   content: '✖';
 }
 
@@ -218,17 +206,27 @@ onUnmounted(() => {
   left: 8px;
 }
 
-.light .popup-content {
+.popup-title-close {
+  text-decoration: none;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.light .vmap-popup-content {
   background-color: white;
   color: black;
 }
 
-.dark .popup-content {
+.dark .vmap-popup-content {
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
 
-.popup-content {
+.vmap-popup-content {
   width: 100%;
   padding: 5px;
   text-align: center;
@@ -236,6 +234,4 @@ onUnmounted(() => {
   // max-height: 300px;
   // overflow-y: auto;
 }
-
-
 </style>

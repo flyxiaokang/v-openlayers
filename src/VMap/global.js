@@ -4,26 +4,31 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 14:30:59
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-28 15:24:25
+ * @LastEditTime: 2023-09-07 09:50:12
  */
+export const V_MAP_THEME = {
+  light: 'light',
+  dark: 'dark',
+  custom: 'custom',
+}
 // 服务类型
 export const V_MAP_TYPE_ENUM = {
   supermap: 'supermap',
   supermapwmts: 'supermapwmts',
   tdt: 'tdt',
   geoserverwmts: 'geoserverwmts',
-  wms: 'wms',
-  wmsimage: 'wmsimage',
   wmts: 'wmts',
   tms: 'tms',
   xyz: 'xyz',
   wfs: 'wfs',
+  wmsimage: 'wmsimage',
+  wmsimagetile: 'wmsimagetile',
   arcgisdynamic: 'arcgisdynamic',
   arcgisfeature: 'arcgisfeature',
   arcgisgroup: 'arcgisgroup',
   arcgisimage: 'arcgisimage',
+  arcgisimagetile: 'arcgisimagetile',
   arcgistile: 'arcgistile',
-  arcgiswmts: 'arcgiswmts',
   mvt: 'mvt',
   '3d-tileset': '3d-tileset',
   bdmap: 'bdmap',
