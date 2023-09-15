@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-09-22 14:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-04 14:39:56
+ * @LastEditTime: 2023-09-14 10:38:46
 -->
 <template>
   <div class="vmap-mapbar" :style="getStyle">

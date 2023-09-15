@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-05 22:38:56
+ * @LastEditTime: 2023-09-07 23:19:41
 -->
 <template>
   <div class="vmap-container">
@@ -108,7 +108,7 @@ import MapStatus from '@/VMap/public/components/Map/MapStatus.vue'
 import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
 
 import TableWidget from '@/VMap/components/Table/index.vue'
-import Draggable from '@/VMap/components/Draggable/index.vue'
+//import Draggable from '@/VMap/components/Draggable/index.vue'
 import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
 
 const olInstance = getOlHandler()

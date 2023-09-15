@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-25 17:40:18
+ * @LastEditTime: 2023-09-15 12:40:27
 -->
 <template>
   <div id="app-container">
@@ -56,22 +56,22 @@
         :cluster-options="clusterOptions"
         @select-change="handleSelectChange"
       />
-      <!-- 
+      
       <OlVector
         :features="MultLinesJson"
         :modifiable="checkStatus"
         :style="lineStyle"
         :z-index="104"
         @select-change="handleSelectChange"
-      /> -->
+      />
 
-      <!-- <OlVector
+      <OlVector
         :features="PolygonJson"
         :modifiable="checkStatus"
         :z-index="103"
         :style="polygonStyle"
         @select-change="handleSelectChange"
-      /> -->
+      />
 
       <!-- <OlVector
         :features="PointGeojson"

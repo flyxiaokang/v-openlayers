@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-10-20 10:04:21
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-04-28 11:13:45
+ * @LastEditTime: 2023-09-14 10:36:07
  */
 
 import Draw from 'ol/interaction/Draw'
@@ -443,6 +443,7 @@ export default class MeasureHandler extends Base{
   }
 
   measureLength(map = this.map, clearLast = false) {
+    debugger
     map.set('mouseStatus',V_MOUSE_STATUS_ENUM.mesure)
     clearLast && clear(map)
     init(map, 'length')

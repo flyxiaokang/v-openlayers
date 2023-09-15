@@ -45,24 +45,12 @@
     </div>
 </template>
 <script>
-import {
-    ArrowLeft,
-    ArrowRight,
-    Delete,
-    Edit,
-    Share,
-} from "@element-plus/icons-vue";
+
 export default {
     data() {
         return {
-            ArrowLeft,
-            ArrowRight,
-            Delete,
-            Edit,
-            Share,
         };
     },
-
     methods: {
         handleDraw(type) {
             this.$emit('on-drawchange',type,false,false)

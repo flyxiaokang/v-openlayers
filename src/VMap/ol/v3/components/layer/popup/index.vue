@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-09-04 20:56:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-07 09:36:39
+ * @LastEditTime: 2023-09-09 17:12:02
 -->
 <template>
   <MapPopup
@@ -16,11 +16,13 @@
     @on-close="handleClosePopup"
     :class="popupClass"
   >
-    <TableWidget
-      :style="{ height: tableHeight + 'px' }"
-      :table-header="tableHeader"
-      :table-data="tableData"
-    />
+    <slot :data="properties">
+      <TableWidget
+        :style="{ height: tableHeight + 'px' }"
+        :table-header="tableHeader"
+        :table-data="tableData"
+      />
+    </slot>
   </MapPopup>
 </template>
 <script setup>
@@ -87,7 +89,7 @@ const handleClosePopup = () => {
   return false
 }
 
-const handleReset = ()=>{
+const handleReset = () => {
   if (overlay) {
     olHandler.map.removeOverlay(overlay)
     overlay = null
