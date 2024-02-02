@@ -16,6 +16,7 @@
           <el-button type="primary" size="small" @click="handleChangePolygon"
             >更新面</el-button
           >
+
           <el-slider
             style="width: 150px"
             v-model="opacity"
@@ -23,6 +24,11 @@
             :max="1"
             :step="0.1"
           />
+        </el-tab-pane>
+
+        <el-tab-pane label="h" name="second">
+          <el-input v-model="rowTotal" style="width: 100px"></el-input>
+          <el-button @click="handleCalc">计算</el-button>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -56,7 +62,7 @@
         :cluster-options="clusterOptions"
         @select-change="handleSelectChange"
       />
-      
+
       <OlVector
         :features="MultLinesJson"
         :modifiable="checkStatus"
@@ -185,8 +191,9 @@ const requestParamsWmts = reactive({
   style: 'default',
 })
 
-
-const xyzUrl = ref('https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer')
+const xyzUrl = ref(
+  'https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer'
+)
 
 import MultLinesJson from '../data/wkt/multlines'
 import PointsJson from '../data/wkt/points'
@@ -293,6 +300,11 @@ const polygonStyle = ref({
     width: 5,
   },
 })
+
+const rowTotal = ref()
+const handleCalc = () => {
+
+}
 </script>
 
 <style scoped>
