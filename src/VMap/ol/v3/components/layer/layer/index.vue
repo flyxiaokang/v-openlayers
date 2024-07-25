@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:47:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-30 16:23:48
+ * @LastEditTime: 2024-07-19 16:41:18
 -->
 <template></template>
 
@@ -13,13 +13,14 @@ import { ref, watch, computed } from 'vue'
 import { uuid } from '@/VMap/public/utils/base/string'
 import { useProps, useEmits, useWatch } from '../baseLayer'
 import { nextTick, onMounted, onUnmounted, inject, toRefs } from 'vue'
-import { V_MAP_TYPE_ENUM, getTdtUrl } from '@/VMap/global.js'
+import { V_MAP_PROVIDER, getTdtUrl } from '@/VMap/global.js'
 import { getConfig } from '@/VMap/ol/config'
 import { isString } from '@/VMap/public/utils/base/validate'
+import { OlHandler } from '@/entry/ol.entry'
 
-const olHandler = inject('olHandler')
+let olHandler = new OlHandler()
+olHandler = inject('olHandler')
 
-const validType = ['img', 'vec', 'ter']
 const props = defineProps({
   ...useProps,
   url: {
@@ -38,8 +39,11 @@ const props = defineProps({
           'wmts',
           'xyz',
           'wmsimagetile',
+          'wmsimage',
           'arcgistile',
           'arcgisimagetile',
+          'mapbox',
+          'geoserver',
         ].includes(value.toLowerCase())
       )
     },
@@ -64,7 +68,7 @@ const emits = defineEmits(useEmits)
 const { layerId, url, mapProvider, mapStyle, token, requestParams } =
   toRefs(props)
 
-console.log('???',toRefs(props))
+// console.log('???', toRefs(props))
 
 let layerObject = ref(null)
 useWatch(toRefs(props), layerObject)
@@ -82,35 +86,49 @@ const getMapProvider = computed(() => {
 })
 
 const isTdt = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.tdt
+  return getMapProvider.value === V_MAP_PROVIDER.tdt
 })
 
 const isSupermap = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.supermap
+  return getMapProvider.value === V_MAP_PROVIDER.supermap
 })
 
 const isWmts = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.wmts
+  return getMapProvider.value === V_MAP_PROVIDER.wmts
 })
 
 const isXYZ = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.xyz
+  return getMapProvider.value === V_MAP_PROVIDER.xyz
 })
 
 const isArcgistile = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.arcgistile
+  return getMapProvider.value === V_MAP_PROVIDER.arcgistile
 })
 
 const isArcgisImageTile = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.arcgisimagetile
+  return getMapProvider.value === V_MAP_PROVIDER.arcgisimagetile
 })
 
 const isArcgisImage = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.arcgisimage
+  return getMapProvider.value === V_MAP_PROVIDER.arcgisimage
 })
 
 const isWmsTile = computed(() => {
-  return getMapProvider.value === V_MAP_TYPE_ENUM.wmsimagetile
+  return [V_MAP_PROVIDER.wmsimagetile, V_MAP_PROVIDER.wmsimage].includes(
+    getMapProvider.value
+  )
+})
+
+const isWmsImage = computed(() => {
+  return getMapProvider.value === V_MAP_PROVIDER.wmsimage
+})
+
+const isGeoserverMvt = computed(() => {
+  return getMapProvider.value === V_MAP_PROVIDER.geoservermvt
+})
+
+const isMapbox = computed(() => {
+  return getMapProvider.value === V_MAP_PROVIDER.mapboxmvt
 })
 
 const getUrl = computed(() => {
@@ -178,15 +196,14 @@ const getWmsUrl = () => {
 }
 
 const initLayer = () => {
-  console.log(getUrl.value)
-  const type = V_MAP_TYPE_ENUM[getMapProvider.value]
+  // console.log(getUrl.value,getMapProvider.value)
+  const type = V_MAP_PROVIDER[getMapProvider.value]
   if (!type) {
     console.error('未知的地图提供者')
     return
   }
   const id = getLayerId.value
   if (getUrl.value && checkUrl()) {
-    debugger
     olHandler.removeLayerById(id)
     if (isWmts.value) {
       layerObject.value = olHandler.getLayerByType({
@@ -196,6 +213,17 @@ const initLayer = () => {
         url: getUrl.value,
         params: { ...requestParams.value },
       })
+    } else if (isGeoserverMvt.value) {
+      layerObject.value = olHandler.getLayerByType({
+        ...props,
+        id,
+        type,
+        url: getUrl.value,
+        params: {
+          ...requestParams.value,
+          style: props.layerStyle,
+        },
+      })
     } else {
       layerObject.value = olHandler.getLayerByType({
         ...props,
@@ -204,8 +232,10 @@ const initLayer = () => {
         url: getUrl.value,
       })
     }
-    olHandler.map.addLayer(layerObject.value)
-    emits('ready', layerObject.value)
+    if (layerObject.value) {
+      olHandler.map.addLayer(layerObject.value)
+      emits('ready', layerObject.value)
+    }
   }
 }
 

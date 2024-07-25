@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-10-20 11:29:38
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-04-23 10:19:43
+ * @LastEditTime: 2024-06-19 17:08:32
  */
 
 export function uuid() {
@@ -19,10 +19,10 @@ export function uuid() {
     return s.join("");
 }
 
-export function uuidOnlyStr() {
+export function uuidOnlyStr(length = 10) {
     let s = [];
-    let hexDigits = "abcdefghijklmn";
-    for (let i = 0; i < 10; i++) {
+    let hexDigits = "abcdefghijklmnopqrstuvwxyz";
+    for (let i = 0; i < length; i++) {
         s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
     }
     return s.join("");

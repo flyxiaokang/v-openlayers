@@ -4,16 +4,20 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 15:55:57
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-24 15:55:58
+ * @LastEditTime: 2024-01-02 10:47:14
 -->
 <template>
-  <div>
-    
-  </div>
+  <Layer map-provider="supermap"/>
 </template>
-<script setup>
 
+<script setup>
+import Layer from '../layer/index.vue'
 </script>
-<style lang="scss" scoped>
-  
-</style>
+
+<script>
+export default {
+  name:'OlSupermap'
+}
+</script>
+
+<style lang="scss" scoped></style>

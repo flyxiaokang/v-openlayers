@@ -6,8 +6,13 @@
  * @LastEditors: kangjinrui
  * @LastEditTime: 2023-09-06 17:17:40
  */
+import { V_THEME } from '@/VMap/global'
 
 export const useProps = {
+  theme: {
+    type: String,
+    default: V_THEME.light,
+  },
   visible: {
     type: Boolean,
     default: false,

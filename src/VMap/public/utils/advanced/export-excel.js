@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-11-03 10:52:01
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-05-29 10:54:06
+ * @LastEditTime: 2024-01-22 18:16:26
  */
 
 import FileSaver from 'file-saver'
@@ -96,6 +96,22 @@ export function exportExcelByJson(jsonData, {
         type: 'application/octet-stream'
     }), fileName + ".xlsx")
 }
+
+var obj = [];
+obj.push({
+    name: "sheet1",
+    data: sheetData,
+});
+
+obj.push({
+    name: "sheet2",
+    data: sheetData,
+});
+
+// exportExcelWithMultipleSheet(obj, {
+//     skipHeader: true,
+//     fileName: "测试123",
+// });
 
 export function exportExcelWithMultipleSheet(data, {
     header = [],

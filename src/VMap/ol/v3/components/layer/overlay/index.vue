@@ -4,16 +4,13 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:11:12
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-07 09:52:00
+ * @LastEditTime: 2024-01-18 09:41:09
 -->
 <template>
   <div v-show="false" :id="popupId" :class="getClass">
     <div v-if="showTitle" class="vmap-title">
       <span class="popup-title">{{ title }}</span>
-      <span
-        class="popup-title-close"
-        @click="handleClose"
-      ></span>
+      <span class="popup-title-close" @click="handleClose"></span>
     </div>
     <div :id="contentId" class="vmap-popup-content">
       <slot></slot>
@@ -36,14 +33,14 @@ import {
   onUnmounted,
 } from 'vue'
 
-import { V_MAP_THEME } from '@/VMap/global'
+import { V_THEME } from '@/VMap/global'
 
 const olHandler = inject('olHandler')
 
 const props = defineProps({
   theme: {
     type: String,
-    default: V_MAP_THEME.dark,
+    default: V_THEME.dark,
   },
   showTitle: {
     type: Boolean,
@@ -107,9 +104,9 @@ const init = () => {
       center: position.value,
       offset: [0, 0],
       collection: false,
-      options:{
-        className:'vmap-overlay-top'
-      }
+      options: {
+        className: 'vmap-overlay-top',
+      },
     })
   }
 }
@@ -140,6 +137,12 @@ onUnmounted(() => {
 })
 </script>
 
+<script>
+export default {
+  name: 'OlOverlay',
+}
+</script>
+
 <style lang="scss" scoped>
 .vmap-ol-popup {
   position: absolute;
@@ -149,6 +152,7 @@ onUnmounted(() => {
   bottom: 12px;
   left: -50px;
   min-width: 99px !important;
+  border-radius: 8px;
 }
 
 .vmap-title {
@@ -156,8 +160,8 @@ onUnmounted(() => {
   height: 30px;
   line-height: 30px;
   background-color: #409eff;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 
 .vmap-ol-popup:after,
@@ -191,8 +195,6 @@ onUnmounted(() => {
   left: 48px;
   margin-left: -11px;
 }
-
-
 
 .popup-title-close:after {
   content: '✖';

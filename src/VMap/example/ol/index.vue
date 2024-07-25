@@ -4,313 +4,38 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-15 12:40:27
+ * @LastEditTime: 2024-06-19 16:13:41
 -->
 <template>
   <div id="app-container">
-    <div class="tools-view">
-      <el-tabs v-model="activeName" class="demo-tabs" style="margin: 0 10px">
-        <el-tab-pane label="layer" name="first">
-          <el-checkbox v-model="checkStatus">编辑</el-checkbox>
-          <el-checkbox v-model="checkVisible">显示</el-checkbox>
-          <el-button type="primary" size="small" @click="handleChangePolygon"
-            >更新面</el-button
-          >
-
-          <el-slider
-            style="width: 150px"
-            v-model="opacity"
-            :min="0"
-            :max="1"
-            :step="0.1"
-          />
-        </el-tab-pane>
-
-        <el-tab-pane label="h" name="second">
-          <el-input v-model="rowTotal" style="width: 100px"></el-input>
-          <el-button @click="handleCalc">计算</el-button>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
-
-    <OlMap
-      class="app-content"
-      show-basemapbar
-      show-toolbar
-      @ready="handleMapReady"
-      @mouse-click="handleMouseClick"
-      @mouse-move="handleMouseMove"
+    <el-tabs
+      v-model="activeName"
+      class="demo-tabs"
+      style="margin: 0 10px; height: 100%"
     >
-      <OlOverlay :title="'test3'" :position="overlayPosition">
-        <div
-          style="display: flex; flex-direction: row"
-          v-for="(value, key) in featureProperties"
-        >
-          <div style="min-width: 100px; text-align: right">{{ key }}:</div>
-          <div style="min-width: 100px; text-align: left; margin-left: 10px">
-            {{ value }}
-          </div>
-        </div>
-      </OlOverlay>
-
-      <OlVector
-        :features="PointsJson"
-        :visible="checkVisible"
-        :modifiable="checkStatus"
-        :style="pointStyle2"
-        :z-index="1000"
-        :cluster-options="clusterOptions"
-        @select-change="handleSelectChange"
-      />
-
-      <OlVector
-        :features="MultLinesJson"
-        :modifiable="checkStatus"
-        :style="lineStyle"
-        :z-index="104"
-        @select-change="handleSelectChange"
-      />
-
-      <OlVector
-        :features="PolygonJson"
-        :modifiable="checkStatus"
-        :z-index="103"
-        :style="polygonStyle"
-        @select-change="handleSelectChange"
-      />
-
-      <!-- <OlVector
-        :features="PointGeojson"
-        :modifiable="checkStatus"
-        :style="pointStyle"
-        :z-index="1000"
-        :cluster-options="clusterOptions"
-        @select-change="handleSelectChange"
-      /> -->
-
-      <!-- <OlVector
-        :features="PolylineGeojson"
-        :modifiable="checkStatus"
-        :style="lineStyle"
-        :z-index="104"
-        @select-change="handleSelectChange"
-      /> -->
-
-      <!-- <OlVector
-        :features="PolygonGeojson"
-        :modifiable="checkStatus"
-        :style="polygonStyle"
-        :z-index="103"
-        @select-change="handleSelectChange"
-      /> -->
-
-      <!-- tdt -->
-      <OlTile
-        map-provider="tdt"
-        map-style="img"
-        :visible="checkVisible"
-        :opacity="opacity"
-        :min-zoom="3"
-        :max-zoom="10"
-      />
-
-      <!-- <OlTile
-        map-provider="supermap"
-        :url="superMapWmtsUrl"
-        :request-params="requestParams"
-        :visible="checkVisible"
-        :opacity="opacity"
-        :min-zoom="3"
-        :max-zoom="10"
-      /> -->
-
-      <!-- <OlTile
-        map-provider="supermap"
-        :url="superMapWmtsUrlWebMocat"
-        :request-params="requestParams"
-        :visible="checkVisible"
-        :opacity="opacity"
-        :min-zoom="3"
-        :max-zoom="10"
-      /> -->
-
-      <OlTile
-        map-provider="wmts"
-        :url="wmtsUrl"
-        :request-params="requestParamsWmts"
-        :visible="checkVisible"
-        :opacity="opacity"
-      />
-
-      <OlTile
-        map-provider="xyz"
-        :url="xyzUrl"
-        :visible="checkVisible"
-        :opacity="opacity"
-      />
-    </OlMap>
+      <el-tab-pane label="4326-map" name="s" lazy>
+        <LayerWgs84 style="height: 70vh"></LayerWgs84>
+      </el-tab-pane>
+      <el-tab-pane label="3857-map" name="first">
+        <LayerWebmocat style="height: 70vh"></LayerWebmocat>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-import OlMap from '@/VMap/ol/v3/components/OlMap.vue'
-import OlOverlay from '@/VMap/ol/v3/components/layer/overlay/index.vue'
-import OlVector from '@/VMap/ol/v3/components/layer/vector/index.vue'
-import OlTile from '@/VMap/ol/v3/components/layer/tile/index.vue'
+import { ref, reactive, watch } from 'vue'
+
+import LayerWgs84 from './components/LayerWgs84.vue'
+import LayerWebmocat from './components/LayerWebmocat.vue'
 
 const activeName = ref('first')
-const checkStatus = ref(false)
-const checkVisible = ref(true)
-const opacity = ref(1)
-
-const tdtUrl = ref('http://t{s}.tianditu.gov.cn/img_w/wmts')
-
-const superMapWmtsUrl = ref(
-  'https://proxy.mwr.cn/usmaps/usmaps?k=MH9dDPhe3quZQTfDhacLpg==&urls=/mnt/usdata/2022_2m.usrmp&layer=4326&style=10&tilematrixset=l&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fwebpimage%2Fpngimage%2Fjpeg'
-)
-
-const superMapWmtsUrlWebMocat = ref('https://proxy.mwr.cn/usmaps/usmaps')
-
-const arcgisTileUrl = ref(
-  'https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/WMTS/tile'
-)
-
-const requestParams = reactive({
-  layer: 'wt',
-  tilematrixset: 'wt',
-  k: 'MH9dDPhe3quZQTfDhacLpg==',
-  urls: '/mnt/usdata/2022_2m.usrmp',
-  // style: 10,
-})
-
-const wmtsUrl = 'https://mrdata.usgs.gov/mapcache/wmts'
-const requestParamsWmts = reactive({
-  layer: 'sgmc2',
-  matrixSet: 'GoogleMapsCompatible',
-  format: 'image/png',
-  style: 'default',
-})
-
-const xyzUrl = ref(
-  'https://sampleserver6.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer'
-)
-
-import MultLinesJson from '../data/wkt/multlines'
-import PointsJson from '../data/wkt/points'
-import MultPolygonsJson from '../data/wkt/multpolygons'
-import VcUtils from '../../public/utils/base/index'
-
-import PolygonGeojson from '../data/geojson/polygon.json'
-import PolylineGeojson from '../data/geojson/polyline.json'
-import PointGeojson from '../data/geojson/point.json'
-// import Point2Geojson from '../data/geojson/point-cluster.json'
-console.log(PolygonGeojson)
-
-let olHandler = null
-const handleMapReady = (e) => {
-  olHandler = e
-}
-
-const overlayPosition = ref([])
-let featureProperties = reactive({})
-const handleMouseClick = (e) => {
-  showOverlay(e)
-}
-const handleMouseMove = (e) => {}
-
-const showOverlay = (e) => {
-  const coordinate = e.coordinate
-  let features = olHandler.map.getFeaturesAtPixel(e.pixel) || []
-  if (features.length === 0) {
-    overlayPosition.value = undefined
-    return
-  }
-  debugger
-  featureProperties = reactive({})
-  const properties = features[0].getProperties()
-  for (const key in properties) {
-    if (Object.hasOwnProperty.call(properties, key)) {
-      const element = properties[key]
-      if (VcUtils.isString(element)) {
-        featureProperties[key] = element
-      }
-    }
-  }
-  console.log(featureProperties)
-  if (Object.keys(featureProperties).length > 0) {
-    overlayPosition.value = coordinate
-  }
-}
-
-const handleSelectChange = () => {}
-
-const PolygonJson = ref(MultPolygonsJson)
-const handleChangePolygon = () => {
-  PolygonJson.value.forEach((p) => {
-    p['style'] = {
-      fill: {
-        color: VcUtils.getRandomRgb(0.6),
-      },
-    }
-  })
-}
-
-const pointStyle = ref({
-  // icon: {
-  //   src: new URL('../../public/static/svg/map/location.svg', import.meta.url)
-  //     .href,
-  //   scale: 1,
-  // },
-  text: {
-    field: 'gateName',
-    backgroundColor: 'green',
-    padding: [0, 5, 0, 5],
-  },
-})
-
-const pointStyle2 = ref({
-  icon: {
-    src: new URL('../../public/static/svg/map/location.svg', import.meta.url)
-      .href,
-    scale: 1,
-  },
-  text: {
-    backgroundColor: 'green',
-    padding: [0, 5, 0, 5],
-  },
-})
-
-const clusterOptions = reactive({
-  showText: true,
-})
-
-const lineStyle = ref({
-  stroke: {
-    color: 'orange',
-    width: '0',
-  },
-})
-
-const polygonStyle = ref({
-  fill: {
-    color: '#00ff002a',
-  },
-  stroke: {
-    color: 'blue',
-    width: 5,
-  },
-})
-
-const rowTotal = ref()
-const handleCalc = () => {
-
-}
 </script>
 
 <style scoped>
 #app-container {
   width: 100%;
   height: 100%;
+  background-color: white;
 }
 
 #map-view {
@@ -343,7 +68,8 @@ const handleCalc = () => {
 
 .app-content {
   width: 100%;
-  height: calc(100% - 200px);
+  height: 600px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .popup_content {
@@ -365,6 +91,10 @@ const handleCalc = () => {
 
 .el-icon-s-flag {
   margin-right: 20px;
+}
+
+:deep(.el-tabs__content) {
+  height: calc(100% - 60px);
 }
 </style>
 
@@ -441,4 +171,6 @@ const handleCalc = () => {
   padding: 10px;
   background-color: white;
 }
+
+
 </style>

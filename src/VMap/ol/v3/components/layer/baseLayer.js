@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:12:48
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-24 15:39:20
+ * @LastEditTime: 2024-06-06 17:17:54
  */
 
 import { watch } from 'vue'
@@ -18,12 +18,22 @@ export const useProps = {
     type: String,
     default: '',
   },
+  layerName: {
+    type: String,
+    default: '',
+  },
+  layerStyle: {
+    type: [Object, Function],
+    default() {
+      return {}
+    },
+  },
   visible: {
     type: Boolean,
     default: true,
   },
   opacity: {
-    type: Number,
+    type: [Number,String],
     default: 1,
   },
   extent: {
@@ -31,7 +41,7 @@ export const useProps = {
     default: [],
   },
   zIndex: {
-    type: [Number, undefined],
+    type: [Number, String, undefined],
     default: undefined,
   },
   minZoom: {
@@ -48,23 +58,29 @@ export const useProps = {
   },
 }
 
-export const useEmits = ['ready','error']
+export const useEmits = ['ready', 'error']
 
-export const useWatch = ({ visible, zIndex, opacity, minZoom,maxZoom }, layer) => {
+export const useWatch = (
+  { visible, zIndex, opacity, minZoom, maxZoom, layerStyle },
+  layer
+) => {
   watch(visible, (nv) => {
     layer.value.setVisible(nv)
   })
   watch(zIndex, (nv) => {
-    layer.value.setZindex(nv)
+    layer.value.setZindex(Number(nv))
   })
   watch(opacity, (nv) => {
-    layer.value.setOpacity(nv)
+    layer.value.setOpacity(Number(nv))
   })
   watch(minZoom, (nv) => {
-    layer.value.setMinZoom(nv)
+    layer.value.setMinZoom(Number(nv))
   })
   watch(maxZoom, (nv) => {
-    layer.value.seMaxZoom(nv)
+    layer.value.seMaxZoom(Number(nv))
+  })
+  watch(layerStyle, (nv) => {
+    layer.value.setStyle(nv)
   })
 }
 

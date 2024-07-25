@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:23:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-04 22:55:14
+ * @LastEditTime: 2024-07-22 14:53:12
  */
 
 // import 'ol/ol.css'
@@ -17,6 +17,10 @@ import TileWMS from 'ol/source/TileWMS'
 import ImageWMS from 'ol/source/ImageWMS'
 
 import TileImage from 'ol/source/TileImage'
+
+import MVT from 'ol/format/MVT.js'
+import VectorTileLayer from 'ol/layer/VectorTile.js'
+import VectorTileSource from 'ol/source/VectorTile.js'
 
 import { Heatmap as HeatmapLayer } from 'ol/layer'
 
@@ -31,6 +35,8 @@ import WMTSTileGrid from 'ol/tilegrid/WMTS'
 import { ImageArcGISRest, TileArcGISRest } from 'ol/source'
 
 import TileGrid from 'ol/tilegrid/TileGrid'
+
+import { createXYZ } from 'ol/tilegrid'
 
 import Overlay from 'ol/Overlay'
 import Feature from 'ol/Feature'
@@ -50,9 +56,11 @@ import { Circle } from 'ol/geom'
 import { get as getProjection } from 'ol/proj'
 import { getTopLeft, getWidth } from 'ol/extent'
 
+import Projection from 'ol/proj/projection'
+
 import GeoJSON from 'ol/format/GeoJSON'
 
-import V_GLOBAL_CONFIG from '@/VMap/global'
+import V_MAP_GLOBAL from '@/VMap/global'
 
 import CustomUtils from '@/VMap/public/utils/base'
 
@@ -65,6 +73,10 @@ import { getBaiduLayer } from './baidu/BaiduMap'
 
 import VcUtils from '@/VMap/public/utils/base'
 import { getStyle, getIconStyle } from './StyleHandler'
+import { createMapboxStreetsV6Style } from './mapbox-streets-v6-style'
+
+import { getConfig, isWgs84 } from '@/VMap/ol/config'
+import { isFunction } from '@/VMap/public/utils/base/type'
 
 const projection = getProjection('EPSG:3857')
 const projectionExtent = projection.getExtent()
@@ -152,9 +164,9 @@ export default class LayerHandler {
   }
 
   getWmtsWgs84(options) {
-    const projection = getProjection(V_GLOBAL_CONFIG['EPSG:4326'].prj)
+    const projection = getProjection(V_MAP_GLOBAL['EPSG:4326'].prj)
     const projectionExtent = projection.getExtent()
-    const { resolutions, matrixIds } = V_GLOBAL_CONFIG['EPSG:4326']
+    const { resolutions, matrixIds } = V_MAP_GLOBAL['EPSG:4326']
     return new TileLayer({
       id: options.id === undefined ? 'id_' + Math.random() : options.id,
       opacity: options.opacity === undefined ? 1 : options.opacity,
@@ -173,37 +185,48 @@ export default class LayerHandler {
   }
 
   getWmtsByPrj({ prj, options }) {
-    const projection = getProjection(V_GLOBAL_CONFIG[prj].prj)
+    const projection = getProjection(V_MAP_GLOBAL[prj].prj)
     const projectionExtent = projection.getExtent()
-    const { resolutions, matrixIds } = V_GLOBAL_CONFIG[prj]
+    const { resolutions, matrixIds } = V_MAP_GLOBAL[prj]
+    const matrixIdsWMTS = []
+    matrixIds.forEach((element) => {
+      if (options.params.matrixSetPrefix) {
+        matrixIdsWMTS.push(`${options.params.matrixSetPrefix}${element}`)
+      } else {
+        matrixIdsWMTS.push(`${element}`)
+      }
+    })
     const { url, params = {} } = options
+    if (!params.hasOwnProperty('matrixSet')) {
+      params['matrixSet'] = params.tilematrixset
+    }
     return new TileLayer({
       ...getLayerParams(options),
       source: new WMTS({
         url,
         format: 'image/png',
-        style: 'default',
+        style: '',
         ...params,
         wrapX: true,
         projection: projection,
         tileGrid: new WMTSTileGrid({
           origin: getTopLeft(projectionExtent),
           resolutions,
-          matrixIds,
+          matrixIds: matrixIdsWMTS,
         }),
       }),
     })
   }
 
   getWmtsGeoserver({ prj = 'EPSG:4326', options }) {
-    const projection = getProjection(V_GLOBAL_CONFIG[prj].prj)
+    const projection = getProjection(V_MAP_GLOBAL[prj].prj)
     const projectionExtent = projection.getExtent()
-    const { resolutions, matrixIds } = V_GLOBAL_CONFIG[prj]
+    const { resolutions, matrixIds } = V_MAP_GLOBAL[prj]
 
-    const matrixIdsWMTS = []
-    matrixIds.forEach((element) => {
-      matrixIdsWMTS.push(`${prj}:${element}`)
-    })
+    const matrixIdsWMTS = this.getMatrixIds(matrixIds, prj)
+    // matrixIds.forEach((element) => {
+    //   matrixIdsWMTS.push(`${prj}:${element}`)
+    // })
     // 切片策略
     const tilegrid = new WMTSTileGrid({
       extent: [-180.0, -90.0, 180.0, 90.0], // 范围
@@ -214,13 +237,16 @@ export default class LayerHandler {
     })
 
     const { params } = options
+    if (!params.hasOwnProperty('matrixSet')) {
+      params['matrixSet'] = params.tilematrixset
+    }
     const tileSource = new WMTS({
       url: options.url.split('?')[0],
       projection: projection,
       tileGrid: tilegrid,
+      format: 'image/png',
       ...CustomUtils.parasUrlParams2Obj(options.url),
       ...params,
-      format: 'image/png',
     })
     return new TileLayer({
       id: options.id === undefined ? 'id_' + Math.random() : options.id,
@@ -232,7 +258,7 @@ export default class LayerHandler {
   }
 
   getXYZ(options) {
-    const {url} = options
+    const { url } = options
     return new TileLayer({
       ...getLayerParams(options),
       source: new XYZ({
@@ -242,7 +268,7 @@ export default class LayerHandler {
   }
 
   getXYZByPrj({ prj, options = {} }) {
-    const {url} = options
+    const { url } = options
     return new TileLayer({
       ...getLayerParams(options),
       source: new XYZ({
@@ -276,14 +302,15 @@ export default class LayerHandler {
   }
 
   getSuperMapWmts({ prj, options }) {
-    const projection = getProjection(V_GLOBAL_CONFIG[prj].prj)
+    const projection = getProjection(V_MAP_GLOBAL[prj].prj)
     const projectionExtent = projection.getExtent()
-    const { resolutions, matrixIds } = V_GLOBAL_CONFIG[prj]
+    const { resolutions, matrixIds, origin } = V_MAP_GLOBAL[prj]
+    const { requestParams } = options
 
     const tileGrid = new WMTSTileGrid({
-      origin: getTopLeft(projectionExtent),
-      resolutions,
-      matrixIds,
+      origin: requestParams.origin || origin || getTopLeft(projectionExtent),
+      resolutions: requestParams.resolutions || resolutions,
+      matrixIds: requestParams.matrixIds || matrixIds,
     })
 
     const layer = new TileLayer({
@@ -301,7 +328,6 @@ export default class LayerHandler {
           // let y = -tileCoord[2] - 1
 
           // return options.url + `&layer=w&request=gettile&tilesize=512&tilematrixset=w&tilematrix=${z}&tilerow=${y}&tilecol=${x}`
-
           // if (false && options.url.includes('?')) {
           //   console.log(
           //     `${options.url}&tilecol=${x}&tilerow=${y}&tilematrix=${z}`
@@ -322,9 +348,9 @@ export default class LayerHandler {
   }
 
   getSuperMapXYZ({ prj, options }) {
-    const projection = getProjection(V_GLOBAL_CONFIG[prj].prj)
+    const projection = getProjection(V_MAP_GLOBAL[prj].prj)
     const projectionExtent = projection.getExtent()
-    const { resolutions, matrixIds } = V_GLOBAL_CONFIG[prj]
+    const { resolutions, matrixIds } = V_MAP_GLOBAL[prj]
 
     const tileGrid = new WMTSTileGrid({
       origin: getTopLeft(projectionExtent),
@@ -522,7 +548,7 @@ export default class LayerHandler {
 
   getHeatMapLayer(geojson, options) {
     let { field, blur, radius } = options
-    var source = new VectorSource({
+    let source = new VectorSource({
       features: new GeoJSON().readFeatures(geojson),
     })
     const vector = new HeatmapLayer({
@@ -615,7 +641,8 @@ export default class LayerHandler {
       minDistance = 0,
       style = {},
       zIndex,
-      showText = true,
+      geomField = 'wktstr',
+      showLabel = true,
     } = {}
   ) {
     let isGeojson = false
@@ -630,11 +657,17 @@ export default class LayerHandler {
         text: { color: '#fff', offsetX: 0, offsetY: 0 },
       }
     }
-    if (showText) {
+    if (showLabel) {
       if (!style.text) {
         style['text'] = {}
       }
       style.text['textFormatter'] = (feature, resolution) => {
+        if (feature.get('features').length === 1) {
+          // console.log(feature.get('features')[0].getProperties())
+          return (
+            feature.get('features')[0].getProperties()[style.text.field] || ''
+          )
+        }
         return feature.get('features').length.toString()
       }
     }
@@ -646,16 +679,21 @@ export default class LayerHandler {
     } else {
       const features = []
       data.forEach((element) => {
-        const feature = new WKT().readFeature(element.wktstr)
+        const feature = new WKT().readFeature(element[geomField])
+        const cloneElement = VcUtils.deepClone(element)
+        delete cloneElement[geomField]
         if (element.id) {
           feature.setId(element.id)
         }
+        feature.setProperties(cloneElement)
         features.push(feature)
       })
       source = new VectorSource({
         features,
       })
     }
+
+    this.trasnformPrj(source.getFeatures())
 
     const clusterSource = new Cluster({
       distance,
@@ -781,8 +819,9 @@ export default class LayerHandler {
     clear = false,
     multiple = true,
     cluster = false,
+    geomField = 'wktstr',
   }) {
-    debugger
+    // debugger
     const isText =
       style.hasOwnProperty('text') && style.text.hasOwnProperty('field')
     const styleClone = getStyle(style)
@@ -790,8 +829,9 @@ export default class LayerHandler {
     const _features = []
     if (features instanceof Array) {
       features.forEach((feature, index) => {
-        if (feature.wktstr) {
-          const { wktstr, id = VcUtils.UUIDGenerator() } = feature
+        if (feature[geomField]) {
+          const { id = VcUtils.UUIDGenerator() } = feature
+          const wktstr = feature[geomField]
           if (feature.style) {
             _style = getStyle(feature.style)
           } else {
@@ -800,7 +840,7 @@ export default class LayerHandler {
           if (multiple) {
             const fs = new WKT().readFeatures(wktstr)
             const copyFeature = VcUtils.deepClone(feature)
-            delete copyFeature.wktstr
+            delete copyFeature[geomField]
             fs.forEach((f) => {
               f.setProperties(copyFeature)
               f.setStyle(_style)
@@ -809,7 +849,7 @@ export default class LayerHandler {
           } else {
             const f = new WKT().readFeature(wktstr)
             const copyFeature = VcUtils.deepClone(feature)
-            delete copyFeature.wktstr
+            delete copyFeature[geomField]
             if (id) {
               f.setId(id)
             }
@@ -842,6 +882,7 @@ export default class LayerHandler {
     if (layer && clear) {
       layer.getSource().clear()
     }
+    this.trasnformPrj(_features)
     if (layer == null) {
       const params = {
         id: layerId,
@@ -935,5 +976,318 @@ export default class LayerHandler {
         }
       }
     }
+  }
+
+  /**
+   * 坐标系转换
+   * @param {*} features
+   */
+  trasnformPrj(features) {
+    if (!isWgs84) {
+      features.forEach((f) => {
+        f.getGeometry().transform('EPSG:4326', getConfig().prj)
+      })
+    }
+  }
+
+  getMvtOfficial(options) {
+    const key =
+      'pk.eyJ1IjoiYWhvY2V2YXIiLCJhIjoiY2t0cGdwMHVnMGdlbzMxbDhwazBic2xrNSJ9.WbcTL9uj8JPAsnT9mgb7oQ'
+    const resolutions = []
+    for (let i = 0; i <= 8; ++i) {
+      resolutions.push(156543.03392804097 / Math.pow(2, i * 2))
+    }
+
+    function tileUrlFunction(tileCoord) {
+      return (
+        // 'https://{a-d}.tiles.mapbox.com/v4/mapbox.mapbox-streets-v6/' +
+        (
+          'http://localhost/mapbox/map/{a-d}/v4/mapbox.mapbox-streets-v6/' +
+          '{z}/{x}/{y}.vector.pbf?access_token=' +
+          key
+        )
+          .replace('{z}', String(tileCoord[0] * 2 - 1))
+          .replace('{x}', String(tileCoord[1]))
+          .replace('{y}', String(tileCoord[2]))
+          .replace(
+            '{a-d}',
+            'abcd'.substr(
+              ((tileCoord[1] << tileCoord[0]) + tileCoord[2]) % 4,
+              1
+            )
+          )
+      )
+    }
+
+    return new VectorTileLayer({
+      source: new VectorTileSource({
+        attributions: '',
+        format: new MVT(),
+        tileGrid: new TileGrid({
+          extent: getProjection('EPSG:3857').getExtent(),
+          resolutions: resolutions,
+          tileSize: 512,
+        }),
+        tileUrlFunction: tileUrlFunction,
+      }),
+      style: createMapboxStreetsV6Style(Style, Fill, Stroke, Icon, Text),
+    })
+  }
+
+  // getMvt() {
+  //   function tileUrlFunction(tileCoord) {
+  //     return (
+  //       // 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/kjr%3AChina_3857_vt@EPSG%3A3857@pbf/' +
+  //       'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/kjr%3AChina_vt@EPSG%3A4326@pbf/' +
+  //       (tileCoord[0] - 1) +
+  //       '/' +
+  //       tileCoord[1] +
+  //       '/' +
+  //       (Math.pow(2, tileCoord[0] - 1) + tileCoord[2]) +
+  //       '.pbf'
+  //     )
+  //   }
+  //   return new VectorTileLayer({
+  //     // source: new VectorTileSource({
+  //     //   format: new MVT(),
+  //     //   tileGrid: createXYZ({
+  //     //     extent: getProjection('EPSG:3857').getExtent(),
+  //     //     maxZoom: 22,
+  //     //     minZoom: 0,
+  //     //   }),
+  //     //   tilePixelRatio: 1,
+  //     source: new VectorTileSource({
+  //       format: new MVT(),
+  //       tileGrid: createXYZ({
+  //         extent: getProjection('EPSG:4326').getExtent(),
+  //         maxZoom: 22,
+  //       }),
+  //       tilePixelRatio: 1,
+  //       // 矢量切片服务地址
+  //       tileUrlFunction: tileUrlFunction,
+  //     }),
+  //     //对矢量切片数据应用的样式
+  //     style: new Style({
+  //       stroke: new Stroke({
+  //         color: 'rgb(255,165,0)',
+  //         width: 3,
+  //       }),
+  //     }),
+  //   })
+  // }
+
+  // getMvt(options) {
+  //   // let projection4326 = new Projection({
+  //   //   code: 'EPSG:4326',
+  //   //   units: 'degrees',
+  //   //   axisOrientation: 'neu',
+  //   // })
+
+  //   const projection4326 = getProjection('EPSG:4326')
+
+  //   return new VectorTileLayer({
+  //     style: new Style({
+  //       stroke: new Stroke({
+  //         color: 'rgb(255,165,0)',
+  //         width: 3,
+  //       }),
+  //     }),
+  //     projection: projection4326,
+  //     source: new VectorTileSource({
+  //       projection: projection4326,
+  //       tilePixelRatio: 1,
+  //       format: new MVT(),
+  //       tileGrid: createXYZ({
+  //         extent: projection4326.getExtent(),
+  //         maxZoom: 21,
+  //       }),
+  //       tileUrlFunction: function (tileCoord) {
+  //         return (
+  //           'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/kjr%3AChina_vt@EPSG%3A4326@pbf/' +
+  //           // layerName +
+  //           // '@EPSG%3A4326@pbf/' +
+  //           (tileCoord[0] - 1) +
+  //           '/' +
+  //           tileCoord[1] +
+  //           '/' +
+  //           (Math.pow(2, tileCoord[0] - 1) + tileCoord[2]) +
+  //           '.pbf'
+  //         )
+  //       },
+  //     }),
+  //   })
+  // }
+
+  // getMvt({ prj = 'EPSG:3857', options }) {
+  //   if (prj.includes(3857)) {
+  //     return this.getMvtMercator(options)
+  //   } else if (prj.includes('4326')) {
+  //     return this.getMvtGeography(options)
+  //   } else {
+  //     return null
+  //   }
+  // }
+
+  getMatrixIds(matrixIds, prj) {
+    const m = []
+    matrixIds.forEach((element) => {
+      m.push(`${prj}:${element}`)
+    })
+    return m
+  }
+
+  getMvt({ prj = 'EPSG:3857', options }) {
+    let gridsetName = prj
+    const projection = getProjection(gridsetName)
+    const { resolutions, matrixIds, tileGrid } = V_MAP_GLOBAL[gridsetName]
+    const matrixIdsWMTS = this.getMatrixIds(matrixIds, gridsetName)
+    const { id, url: baseUrl, visible, opacity, zIndex } = options
+    const { style = {} } = options.params
+    let format = 'application/vnd.mapbox-vector-tile'
+    const params = {
+      REQUEST: 'GetTile',
+      SERVICE: 'WMTS',
+      VERSION: '1.0.0',
+      LAYER: options.params.layer,
+      STYLE: '',
+      TILEMATRIX: gridsetName + ':{z}',
+      TILEMATRIXSET: gridsetName,
+      FORMAT: format,
+      TILECOL: '{x}',
+      TILEROW: '{y}',
+    }
+    function constructSource() {
+      let url = baseUrl + '?'
+      for (let param in params) {
+        url = url + param + '=' + params[param] + '&'
+      }
+      url = url.slice(0, -1)
+
+      let source = new VectorTileSource({
+        url: url,
+        format: new MVT({}),
+        projection: projection,
+        tileGrid: new WMTSTileGrid({
+          tileSize: [256, 256],
+          origin: options.params.origin || tileGrid.origin,
+          resolutions: options.params.resolutions || resolutions,
+          matrixIds: matrixIdsWMTS,
+        }),
+        wrapX: true,
+      })
+      return source
+    }
+    let layer = new VectorTileLayer({
+      id,
+      visible,
+      opacity,
+      source: constructSource(),
+      zIndex,
+      style: isFunction(style)
+        ? style
+        : JSON.stringify(style) === '{}'
+        ? undefined
+        : getStyle(style),
+    })
+    return layer
+  }
+
+  getMvtGeography(options) {
+    var gridsetName = 'EPSG:4326'
+    const projection = getProjection(gridsetName)
+    const { resolutions, matrixIds } = V_MAP_GLOBAL[gridsetName]
+    const matrixIdsWMTS = this.getMatrixIds(matrixIds, gridsetName)
+    const { id, url: baseUrl, visible, opacity } = options
+    const { layer: layerName, style = {} } = options.params
+    var format = 'application/vnd.mapbox-vector-tile'
+    const params = {
+      REQUEST: 'GetTile',
+      SERVICE: 'WMTS',
+      VERSION: '1.0.0',
+      LAYER: layerName,
+      STYLE: '',
+      TILEMATRIX: gridsetName + ':{z}',
+      TILEMATRIXSET: gridsetName,
+      FORMAT: format,
+      TILECOL: '{x}',
+      TILEROW: '{y}',
+    }
+
+    const randomColor = () => {
+      let r, g, b
+      r = Math.floor(Math.random() * 256)
+      g = Math.floor(Math.random() * 256)
+      b = Math.floor(Math.random() * 256)
+      return `rgba(${r},${g},${b},1)`
+    }
+
+    const getStyle = (feature, resolution) => {
+      const value = feature.get('FID')
+      return new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: randomColor(),
+          width: 2,
+        }),
+      })
+    }
+
+    function constructSource() {
+      var url = baseUrl + '?'
+      for (var param in params) {
+        url = url + param + '=' + params[param] + '&'
+      }
+      url = url.slice(0, -1)
+
+      var source = new VectorTileSource({
+        url: url,
+        format: new MVT({}),
+        projection: projection,
+        tileGrid: new WMTSTileGrid({
+          tileSize: [256, 256],
+          origin: [-180.0, 90.0],
+          resolutions: resolutions,
+          matrixIds: matrixIdsWMTS,
+        }),
+        wrapX: true,
+      })
+      return source
+    }
+
+    return new VectorTileLayer({
+      id,
+      visible,
+      opacity,
+      source: constructSource(),
+      // style: getStyle,
+    })
+  }
+
+  getMapboxVt(options = {}) {
+    console.log('................................', options)
+    const {
+      id,
+      url,
+      visible = true,
+      opacity = 1,
+      zIndex = undefined,
+      layerStyle: style,
+    } = options
+    return new VectorTileLayer({
+      id,
+      visible,
+      opacity,
+      zIndex,
+      // declutter: true,
+      source: new VectorTileSource({
+        format: new MVT(),
+        url,
+        // url:"http://localhost/geoserverLocal/gwc/service/tms/1.0.0/kjr%3Acountries@EPSG%3A3857@pbf/{z}/{x}/{y}.pbf"
+      }),
+      style: isFunction(style)
+        ? style
+        : JSON.stringify(style) === '{}'
+        ? undefined
+        : getStyle(style),
+    })
   }
 }

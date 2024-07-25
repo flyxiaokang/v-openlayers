@@ -66,12 +66,12 @@ export let mapTools = [{
     {
         label: "工具条",
         index: -1,
-        iconClass: "iconfont icon-shubiao ",
+        iconClass: "iconfont icon-shubiao",
     },
 ]
 
 export let mapToolsClosed = {
     label: "工具条",
-    index: -1,
-    iconClass: "iconfont icon-shubiao ",
+    index: 'bar',
+    iconClass: "iconfont icon-shubiao",
 }

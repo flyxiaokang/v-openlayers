@@ -1,18 +1,18 @@
 /*
- * @Description:全局变量
- * @Version:
+ * @Description: 全局变量
+ * @Version: 1.0.0
  * @Author: kangjinrui
  * @Date: 2022-01-19 14:30:59
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-07 09:50:12
+ * @LastEditTime: 2024-06-06 17:02:15
  */
-export const V_MAP_THEME = {
+export const V_THEME = {
   light: 'light',
   dark: 'dark',
   custom: 'custom',
 }
 // 服务类型
-export const V_MAP_TYPE_ENUM = {
+export const V_MAP_PROVIDER = {
   supermap: 'supermap',
   supermapwmts: 'supermapwmts',
   tdt: 'tdt',
@@ -30,6 +30,8 @@ export const V_MAP_TYPE_ENUM = {
   arcgisimagetile: 'arcgisimagetile',
   arcgistile: 'arcgistile',
   mvt: 'mvt',
+  geoservermvt: 'geoservermvt',
+  mapboxmvt:'mapboxmvt',
   '3d-tileset': '3d-tileset',
   bdmap: 'bdmap',
   gdmap: 'gdmap',
@@ -38,15 +40,16 @@ export const V_MAP_TYPE_ENUM = {
   clustermap: 'clustermap',
 }
 // 几何类型
-export const V_GEOM_TYPE_ENUM = {
+export const V_GEO_TYPE = {
   point: 'Point',
   polyline: 'Polyline',
   polygon: 'Polygon',
   rectangle: 'rectangle',
   circle: 'circle',
+  billboard: 'billboard',
 }
 // 鼠标状态
-export const V_MOUSE_STATUS_ENUM = {
+export const V_MOUSE_STATUS = {
   none: 'none',
   draw: 'draw',
   mesure: 'measure',
@@ -58,7 +61,7 @@ export const V_TDT = {
   subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
 }
 // 底图
-export const V_BASEMAP_ENUM = {
+export const V_BASE_MAP = {
   TDT_IMG_3857:
     'http://t{s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&tk=' +
     V_TDT.token +
@@ -154,9 +157,14 @@ export const V_WGS84 = {
     0.0013732910159287575, 6.866454960804162e-4, 3.4332275992417075e-4,
     1.7166136807812276e-4, 8.583068403906138e-5, 4.291534201953069e-5,
     2.1457682893727956e-5, 1.0728841446863978e-5, 5.364420723431989e-6,
-    2.6822103617159945e-6, 1.3411051808579973e-6,
+    2.6822103617159945e-6, 1.3411051808579973e-6, 6.705522537231445e-7,
+    3.3527612686157227e-7,
   ],
-  matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+  matrixIds: [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21,
+  ],
+  // origin: [113.45458390127169, 42.616298557469264],
   tileGrid: {
     extent: [-180.0, -90.0, 180.0, 90.0], // 范围
     tileSize: [256, 256],
@@ -174,27 +182,39 @@ export const V_WEB_MECATOR = {
     2.388657133911758, 1.194328566955879, 0.5971642834779395,
   ],
   matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+  tileGrid: {
+    tileSize: [256, 256],
+    origin: [-2.003750834e7, 2.003750834e7],
+  },
 }
 
-const V_GLOBAL_CONFIG = {
+const V_MAP_GLOBAL = {
   'EPSG:4326': V_WGS84,
   'EPSG:3857': V_WEB_MECATOR,
-  V_MAP_TYPE_ENUM,
-  V_GEOM_TYPE_ENUM,
-  V_BASEMAP_ENUM,
+  V_MAP_PROVIDER,
+  V_GEO_TYPE,
+  V_BASE_MAP,
 }
 
-export default V_GLOBAL_CONFIG
+export default V_MAP_GLOBAL
 
 export function getTdtUrl({
   mapStyle = 'TDT_IMG',
   prj = '4326',
   token = V_TDT.token,
+  isCesium = false,
 }) {
+  if (isCesium) {
+    return getTdtUrlForCesium({ mapStyle, prj, token })
+  }
   if (token === '') {
     token = V_TDT.token
   }
-  const url = V_BASEMAP_ENUM[`${mapStyle.toUpperCase()}_${prj}`]
+  prj = prj.replace('EPSG:', '').replace('epsg:', '').trim()
+  mapStyle = mapStyle.toUpperCase()
+  let url =
+    V_BASE_MAP[`${mapStyle.toUpperCase()}_${prj}`] ||
+    V_BASE_MAP[`${mapStyle.toUpperCase().replace('_LABEL', '')}_${prj}_LABEL`]
   if (url) {
     return url
       .replace(V_TDT.token, token)
@@ -202,6 +222,29 @@ export function getTdtUrl({
       .replace('{row}', '{y}')
       .replace('{col}', '{x}')
       .replace('{s}', '{0-7}')
+  } else {
+    return ''
+  }
+}
+
+export function getTdtUrlForCesium({
+  mapStyle = 'TDT_IMG',
+  prj = '4326',
+  token = V_TDT.token,
+}) {
+  if (token === '') {
+    token = V_TDT.token
+  }
+  prj = prj.replace('EPSG:', '').replace('epsg:', '').trim()
+  let url =
+    V_BASE_MAP[`${mapStyle.toUpperCase()}_${prj}`] ||
+    V_BASE_MAP[`${mapStyle.toUpperCase().replace('_LABEL', '')}_${prj}_LABEL`]
+  if (url) {
+    return url
+      .replace(V_TDT.token, token)
+      .replace('{level}', '{TileMatrix}')
+      .replace('{row}', '{TileRow}')
+      .replace('{col}', '{TileCol}')
   } else {
     return ''
   }

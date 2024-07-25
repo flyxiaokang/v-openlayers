@@ -1,38 +1,45 @@
 <!--
- * @Description: 
+ * @Description: 状态条
  * @Version: 
  * @Author: kangjinrui
  * @Date: 2022-04-19 14:32:40
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-04 15:53:26
+ * @LastEditTime: 2024-01-12 16:23:25
 -->
 
 <template>
   <div class="vmap-status-bar">
     <div
-      class="item"
-      style="
-        display: flex;
-        justify-content: space-around;
-        width: 280px;
-      "
+      :class="['item',getClass]"
+      style="display: flex; justify-content: space-around; width: 380px"
     >
       <span>{{ parseLonLat[0] }}</span>
       <span>{{ parseLonLat[1] }}</span>
-    </div>
-    <div class="item">
-      地图级别
+
+      层级
       {{ parseInt(zoom) }}
     </div>
+    <!-- <div :class="['item',getClass]">
+      层级
+      {{ parseInt(zoom) }}
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject, onMounted, nextTick } from 'vue'
-
+import { ref, computed, inject, onMounted, nextTick ,toRefs} from 'vue'
+import { toLonLat } from 'ol/proj'
+import { getConfig } from '@/VMap/ol/config'
 const olHandler = inject('olHandler')
 
+import { V_THEME } from '@/VMap/global'
+import { getClassByTheme } from '@/VMap/public/use/theme'
+
 const props = defineProps({
+  theme: {
+    type: String,
+    default: V_THEME.light,
+  },
   position: {
     type: Array,
     default() {
@@ -46,19 +53,23 @@ const props = defineProps({
 })
 
 const parseLonLat = computed(() => {
+  let labelX = '经度 '
+  let labelY = '纬度 '
+  let unit = '°'
   let [lon, lat] = props.position
-  let labelX = 'X '
-  let labelY = 'Y '
-  let unit = '米'
   if (lon < 180 && lon > -180) {
-    labelX = '经度 '
-    labelY = '纬度 '
-    unit = ''
+  } else {
+    ;[lon, lat] = toLonLat(props.position, getConfig().prj)
   }
   return [
     labelX + parseFloat(lon).toFixed(4) + unit,
     labelY + parseFloat(lat).toFixed(4) + unit,
   ]
+})
+
+const { theme } = toRefs(props)
+const getClass = computed(() => {
+  return [ getClassByTheme(theme.value)]
 })
 </script>
 

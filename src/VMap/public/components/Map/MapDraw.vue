@@ -4,27 +4,28 @@
  * @Author: kangjinrui
  * @Date: 2023-03-14 14:09:37
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-18 14:05:09
+ * @LastEditTime: 2024-06-28 11:42:55
 -->
 
 <template>
-  <el-button-group>
-    <el-button type="primary" @click="handleDraw('Point')">
+  <div>
+    <el-button type="primary" circle @click="handleDraw('Point')">
       <el-icon class="custom-class" size="22"> <IconVcPoint /> </el-icon
     ></el-button>
-    <el-button type="primary" @click="handleDraw('LineString')">
+    <el-button type="primary" circle @click="handleDraw('LineString')">
       <el-icon class="custom-class" size="22"> <IconVcPolyline /> </el-icon
     ></el-button>
-    <el-button type="primary" @click="handleDraw('Polygon')">
+    <el-button type="primary" circle @click="handleDraw('Polygon')">
       <el-icon class="custom-class" size="22"> <IconVcPolygon /> </el-icon
     ></el-button>
-    <el-button type="primary" @click="handleDraw('Clear')">
-      <el-icon class="custom-class" size="22" color="white"> <IconVcClean /> </el-icon
+    <el-button type="primary" circle @click="handleDraw('Clear')">
+      <el-icon class="custom-class" size="22" color="white">
+        <IconVcClean /> </el-icon
     ></el-button>
-    <el-button type="danger" @click="handleClose">
-      <el-icon class="custom-class" size="22"> <IconVcClose/> </el-icon
+    <el-button type="danger" circle @click="handleClose">
+      <el-icon class="custom-class" size="22"> <IconVcClose /> </el-icon
     ></el-button>
-  </el-button-group>
+  </div>
 </template>
 <script setup>
 const emits = defineEmits(['draw-change', 'close'])
@@ -37,4 +38,8 @@ const handleClose = () => {
   emits('close')
 }
 </script>
-<style></style>
+<style scoped>
+.custom-class {
+  cursor: pointer;
+}
+</style>

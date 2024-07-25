@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-12-27 14:28:14
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-04 15:49:38
+ * @LastEditTime: 2024-06-28 11:10:49
  */
 import Base from './Base'
 import 'ol/ol.css'
@@ -19,6 +19,9 @@ import { always } from 'ol/events/condition'
 import Feature from 'ol/Feature'
 import Geometry from 'ol/geom/Geometry'
 import { getArea, getDistance, getLength } from 'ol/sphere'
+// import Interaction from 'ol/interaction/Interaction.js';
+import { defaults as defaultInteraction } from 'ol/interaction/defaults'
+import { fromLonLat } from 'ol/proj'
 
 import VcUtils from '@/VMap/public/utils/base'
 import LayerHandler from './plugins/LayerHandler'
@@ -33,7 +36,7 @@ import * as TransHandler from './plugins/TransformHandler'
 import kriging from './plugins/KrigingHandler'
 
 import { uuid, uuidOnlyStr } from '@/VMap/public/utils/base/string'
-import { V_MAP_TYPE_ENUM, V_MOUSE_STATUS_ENUM } from '@/VMap/global'
+import { V_MAP_PROVIDER, V_MOUSE_STATUS, getTdtUrl } from '@/VMap/global'
 // 自定义配置文件
 import { getConfig } from '@/VMap/ol/config'
 import { Point } from 'ol/geom'
@@ -45,6 +48,8 @@ import {
   Text,
   Icon,
 } from 'ol/style'
+
+import * as StyleHandler from './plugins/StyleHandler'
 
 class VMap extends Base {
   // map 对象
@@ -95,7 +100,10 @@ class VMap extends Base {
 
     this.GeoHandler = GeometryHandler
     this.TransHandler = TransHandler
+    this.StyleHandler = StyleHandler
     this.kriging = kriging
+
+    this.baseLayerCollection = {}
 
     this.getLayerHandler(this.map)
   }
@@ -168,23 +176,44 @@ class VMap extends Base {
   /**
    * 通过配置文件【mapConfig】，创建地图
    */
-  initMap(callback, controls = { showBasemap: true }) {
+  initMap(
+    callback,
+    options = {
+      controls: {},
+      showBasemap: true,
+      dragging: true,
+    }
+  ) {
     if (!this.target) {
       return
     }
-    const { baseLayers, prj } = getConfig()
+    const { controls, showBasemap, view, dragPan } = options
+    if (view.projection === 'EPSG:3857') {
+      view.center = fromLonLat(view.center)
+    }
+    console.log('view......', view)
+    const { baseLayers, prj, defaultBaseLayerId } = getConfig()
     const layers = []
     // 底图集合
     const baseLayersList = []
     VcUtils.tree2list(baseLayers, baseLayersList)
 
-    baseLayersList.forEach((options) => {
-      // baseMap  标识底图图层
-      if (options.url) {
-        options.id = `baseMap_${options.id}`
-        layers.push(this.getLayerByType(options))
-      }
-    })
+    // baseLayersList.forEach((options) => {
+    //   // baseMap  标识底图图层
+    //   if (options.url) {
+    //     options.id = `baseMap_${options.id}`
+    //     layers.push(this.getLayerByType(options))
+    //   }
+    // })
+
+    const defaultBaseLayer = baseLayers.filter(
+      (e) => e.id === defaultBaseLayerId
+    )
+    if (defaultBaseLayer.length > 0) {
+      this.getBaseLayer(defaultBaseLayer[0]).forEach((element) => {
+        layers.push(element)
+      })
+    }
 
     const map = new Map({
       logo: false,
@@ -195,20 +224,28 @@ class VMap extends Base {
         scaleLine: true,
         ...controls,
       }).extend([]), // 隐藏放大缩小按钮
-      layers: controls.showBasemap ? layers : [],
+      interactions: new defaultInteraction({
+        dragPan,
+      }),
+      layers: showBasemap ? layers : [],
       target: this.target,
-      view: new View(getConfig().defaultView),
+      view: new View(view),
     })
     this.map = map
-    this.map.addControl(
-      new ScaleLine({
-        units: 'metric',
-        bar: true,
-        steps: 2,
-        text:true,
-        minWidth: 140,
-      })
-    )
+    if (controls.scaleLine) {
+      this.map.addControl(
+        new ScaleLine({
+          units: 'metric',
+          bar: false,
+          steps: 2,
+          text: true,
+          minWidth: 100,
+          maxWidth: 100,
+          target: 'vmap-status-bar',
+        })
+      )
+    }
+
     this.layerHandler.setMap(this.map)
     setTimeout(() => {
       this.mapInitExtent = this.map
@@ -242,7 +279,7 @@ class VMap extends Base {
       return
     }
     const layers = []
-    baseLayers.forEach((options,index) => {
+    baseLayers.forEach((options, index) => {
       const layer = this.getLayerByType(options)
       if (layer) {
         layer.setZIndex(index)
@@ -391,7 +428,7 @@ class VMap extends Base {
 
   /**
    * 加载图层
-   * @param {*} options 图层信息 {id,visible,type = V_MAP_TYPE_ENUM}
+   * @param {*} options 图层信息 {id,visible,type = V_MAP_PROVIDER}
    * @param {*} prj 坐标系
    */
   addLayerByType(options, prj = getConfig().prj) {
@@ -417,6 +454,48 @@ class VMap extends Base {
     }
   }
 
+  getBaseLayer(group) {
+    const { prj } = getConfig()
+    let layers = []
+    let imageLayer = null
+    this.resetBaseLayer()
+    group.children.forEach((l) => {
+      const { id, visible, opacity, type } = l
+      if (this.checkLayer(l)) {
+        let layerInfo = l
+        if (type === V_MAP_PROVIDER.tdt) {
+          layerInfo = {
+            type,
+            url: getTdtUrl({ mapStyle: id, prj }),
+            visible,
+            opacity,
+          }
+        }
+        imageLayer = this.getLayerByType(layerInfo)
+        if (imageLayer) {
+          this.baseLayerCollection[id] = imageLayer
+          layers.push(imageLayer)
+        }
+      }
+    })
+
+    return layers
+  }
+
+  resetBaseLayer() {
+    for (const key in this.baseLayerCollection) {
+      if (Object.hasOwnProperty.call(this.baseLayerCollection, key)) {
+        const element = this.baseLayerCollection[key]
+        this.map.removeLayer(element)
+        delete this.baseLayerCollection[key]
+      }
+    }
+  }
+
+  checkLayer() {
+    return true
+  }
+
   /**
    * 根据服务类型加加载
    * @param {*} options layer
@@ -424,57 +503,78 @@ class VMap extends Base {
    * @returns
    */
   getLayerByType(options, prj = getConfig().prj) {
-    // console.log(options)
+    this.parseLayerOptions(options)
+    console.log('layeroptions...........', options)
     switch (options.type) {
-      case V_MAP_TYPE_ENUM.wmts:
+      case V_MAP_PROVIDER.wmts:
         return this.layerHandler.getWmtsByPrj({
           prj,
           options,
         })
-      case V_MAP_TYPE_ENUM.tdt:
+      case V_MAP_PROVIDER.tdt:
         return this.layerHandler.getTdtByPrj({
           prj,
           options,
         })
-      case V_MAP_TYPE_ENUM.supermap:
+      case V_MAP_PROVIDER.supermap:
         return this.layerHandler.getSuperMapWmts({
           prj,
           options,
         })
-      case V_MAP_TYPE_ENUM.geoserverwmts:
+      case V_MAP_PROVIDER.geoserverwmts:
         return this.layerHandler.getWmtsGeoserver({
           options,
         })
-      case V_MAP_TYPE_ENUM.wmsimagetile:
+      case V_MAP_PROVIDER.wmsimagetile:
         return this.layerHandler.getWmsTile(options)
-      case V_MAP_TYPE_ENUM.wmsimage:
+      case V_MAP_PROVIDER.wmsimage:
         return this.layerHandler.getWmsImage(options)
-      case V_MAP_TYPE_ENUM.arcgisimage:
+      case V_MAP_PROVIDER.arcgisimage:
         return this.layerHandler.getArcgisImage(options)
-      case V_MAP_TYPE_ENUM.arcgisimagetile:
+      case V_MAP_PROVIDER.arcgisimagetile:
         return this.layerHandler.getArcgisImageTile(options)
-      case V_MAP_TYPE_ENUM.arcgistile:
+      case V_MAP_PROVIDER.arcgistile:
         return this.layerHandler.getXYZ(options)
-      case V_MAP_TYPE_ENUM.geojson:
+      case V_MAP_PROVIDER.geojson:
         return this.layerHandler.getGeojsonLayerWithRender(options)
-      case V_MAP_TYPE_ENUM.heatmap:
+      case V_MAP_PROVIDER.heatmap:
         return this.layerHandler.getHeatMapLayer(options.geojson, options)
-      case V_MAP_TYPE_ENUM.clustermap:
+      case V_MAP_PROVIDER.clustermap:
         return this.layerHandler.getClusterLayerFromGeojson(
           options.geojson,
           options
         )
-      case V_MAP_TYPE_ENUM.xyz:
+      case V_MAP_PROVIDER.xyz:
         return this.layerHandler.getXYZ(options)
-      case V_MAP_TYPE_ENUM.tms:
+      case V_MAP_PROVIDER.tms:
         return this.layerHandler.getTmsLayer(options)
-      case V_MAP_TYPE_ENUM.gdmap:
-        debugger
+      case V_MAP_PROVIDER.gdmap:
         return this.layerHandler.getGaodeLayer(options)
-      case V_MAP_TYPE_ENUM.bdmap:
+      case V_MAP_PROVIDER.bdmap:
         return this.layerHandler.getBaiduLayer(options)
+      case V_MAP_PROVIDER.geoservermvt:
+        // debugger
+        // return this.layerHandler.getWmtsGeoserver({
+        //   // prj,
+        //   options,
+        // })
+        return this.layerHandler.getMvt({ prj, options })
+      case V_MAP_PROVIDER.mapboxmvt:
+        return this.layerHandler.getMapboxVt(options)
       default:
         return null
+    }
+  }
+
+  parseLayerOptions(o) {
+    if (o.hasOwnProperty('opacity')) {
+      o.opacity = Number(o.opacity)
+    }
+    if (o.hasOwnProperty('zIndex')) {
+      o.zIndex = Number(o.zIndex)
+    }
+    if (o.hasOwnProperty('opacity')) {
+      o.opacity = Number(o.opacity)
     }
   }
 

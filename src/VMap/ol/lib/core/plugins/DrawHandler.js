@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-02-11 17:36:50
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-10 17:49:16
+ * @LastEditTime: 2024-06-19 16:44:00
  */
 import { Draw, Modify, Snap, Select } from 'ol/interaction'
 import { Vector as VectorSource } from 'ol/source'
@@ -15,7 +15,7 @@ import { LineString } from 'ol/geom'
 
 import Commonutils from '@/VMap/public/utils/base'
 import LayerHandler from './LayerHandler'
-import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
+import { V_MOUSE_STATUS } from '@/VMap/global'
 import Base from '../Base'
 import DrawConditions from './DrawConditions'
 import { getStyle } from './StyleHandler'
@@ -138,7 +138,7 @@ class DrawHandler extends Base {
   }
 
   activeSnap() {
-    let { source, snap } = this
+    let { source, snap, map } = this
     if (snap) {
       map.removeInteraction(snap)
     }
@@ -206,7 +206,6 @@ class DrawHandler extends Base {
       style: {},
     }
   ) {
-    debugger
     if (Commonutils.isNullOrUndifiend(map)) {
       console.error('map不能为空')
       return false
@@ -229,7 +228,7 @@ class DrawHandler extends Base {
     }
     let { source } = this
     const { innerR = 0, outerR = 0 } = style
-    map.set('mouseStatus', V_MOUSE_STATUS_ENUM.draw)
+    map.set('mouseStatus', V_MOUSE_STATUS.draw)
     if (type === DRAW_TYPE_ENUM.Box) {
       draw = new Draw({
         source,
@@ -290,7 +289,7 @@ class DrawHandler extends Base {
           wkt: new WktHandler().feature2wkt(feature),
         })
       // 结束
-      map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
+      map.set('mouseStatus', V_MOUSE_STATUS.none)
       this.remenberDrawCoordinates = []
       this.step = 0
       this.curFeature = null

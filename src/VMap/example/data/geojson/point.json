@@ -1,31 +1,442 @@
 {
-"type": "FeatureCollection",
-"name": "point",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "adcode": 410100, "name": "?????????", "center": "(2:113.665412,34.757975)", "centroid": "(2:113.477391,34.626256)", "childrenNu": 12, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 0, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.477292302277547, 34.625642291696295 ] } },
-{ "type": "Feature", "properties": { "adcode": 410200, "name": "?????????", "center": "(2:114.341447,34.797049)", "centroid": "(2:114.541763,34.604497)", "childrenNu": 9, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 1, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.541472167913341, 34.603719822651371 ] } },
-{ "type": "Feature", "properties": { "adcode": 410300, "name": "?????????", "center": "(2:112.434468,34.663041)", "centroid": "(2:112.038509,34.293198)", "childrenNu": 14, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 2, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.037836283392323, 34.291128603687923 ] } },
-{ "type": "Feature", "properties": { "adcode": 410300, "name": "?????????", "center": "(2:112.434468,34.663041)", "centroid": "(2:112.038509,34.293198)", "childrenNu": 14, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 2, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.024078522160011, 34.781447774856851 ] } },
-{ "type": "Feature", "properties": { "adcode": 410400, "name": "????????????", "center": "(2:113.307718,33.735241)", "centroid": "(2:113.016514,33.795715)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 3, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.017004011893903, 33.79447196169582 ] } },
-{ "type": "Feature", "properties": { "adcode": 410500, "name": "?????????", "center": "(2:114.352482,36.103442)", "centroid": "(2:114.358257,35.878529)", "childrenNu": 9, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 4, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.35882062506758, 35.877016295307904 ] } },
-{ "type": "Feature", "properties": { "adcode": 410600, "name": "?????????", "center": "(2:114.295444,35.748236)", "centroid": "(2:114.31602,35.721499)", "childrenNu": 5, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 5, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.316180857603854, 35.721229921661688 ] } },
-{ "type": "Feature", "properties": { "adcode": 410700, "name": "?????????", "center": "(2:113.883991,35.302616)", "centroid": "(2:114.095247,35.263966)", "childrenNu": 12, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 6, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.095619762230157, 35.263128393706971 ] } },
-{ "type": "Feature", "properties": { "adcode": 410800, "name": "?????????", "center": "(2:113.238266,35.23904)", "centroid": "(2:113.137719,35.114644)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 7, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.137421572288346, 35.114159521641959 ] } },
-{ "type": "Feature", "properties": { "adcode": 410900, "name": "?????????", "center": "(2:115.041299,35.768234)", "centroid": "(2:115.287416,35.809288)", "childrenNu": 6, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 8, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 115.287043168410719, 35.808460272964481 ] } },
-{ "type": "Feature", "properties": { "adcode": 410900, "name": "?????????", "center": "(2:115.041299,35.768234)", "centroid": "(2:115.287416,35.809288)", "childrenNu": 6, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 8, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 115.499880336644381, 35.904835248590892 ] } },
-{ "type": "Feature", "properties": { "adcode": 411000, "name": "?????????", "center": "(2:113.826063,34.022956)", "centroid": "(2:113.715606,34.071457)", "childrenNu": 6, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 9, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.715857038254001, 34.071000007629102 ] } },
-{ "type": "Feature", "properties": { "adcode": 411100, "name": "?????????", "center": "(2:114.026405,33.575855)", "centroid": "(2:113.905678,33.65448)", "childrenNu": 5, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 10, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.905590985326185, 33.654144848027684 ] } },
-{ "type": "Feature", "properties": { "adcode": 411200, "name": "????????????", "center": "(2:111.194099,34.777338)", "centroid": "(2:111.112608,34.36205)", "childrenNu": 6, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 11, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 111.111719272829845, 34.359811317981951 ] } },
-{ "type": "Feature", "properties": { "adcode": 411200, "name": "????????????", "center": "(2:111.194099,34.777338)", "centroid": "(2:111.112608,34.36205)", "childrenNu": 6, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 11, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.024078522160011, 34.781447774856851 ] } },
-{ "type": "Feature", "properties": { "adcode": 411300, "name": "?????????", "center": "(2:112.540918,32.999082)", "centroid": "(2:112.288385,33.044723)", "childrenNu": 13, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 12, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.289420244914382, 33.042480509587342 ] } },
-{ "type": "Feature", "properties": { "adcode": 411300, "name": "?????????", "center": "(2:112.540918,32.999082)", "centroid": "(2:112.288385,33.044723)", "childrenNu": 13, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 12, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 111.028818782674492, 33.181020196550442 ] } },
-{ "type": "Feature", "properties": { "adcode": 411300, "name": "?????????", "center": "(2:112.540918,32.999082)", "centroid": "(2:112.288385,33.044723)", "childrenNu": 13, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 12, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.729333, 32.36028566666667 ] } },
-{ "type": "Feature", "properties": { "adcode": 411400, "name": "?????????", "center": "(2:115.650497,34.437054)", "centroid": "(2:115.702245,34.28898)", "childrenNu": 9, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 13, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 115.703010103997059, 34.287937296916347 ] } },
-{ "type": "Feature", "properties": { "adcode": 411500, "name": "?????????", "center": "(2:114.075031,32.123274)", "centroid": "(2:114.889128,32.080437)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 14, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.888913482223415, 32.07932490055196 ] } },
-{ "type": "Feature", "properties": { "adcode": 411500, "name": "?????????", "center": "(2:114.075031,32.123274)", "centroid": "(2:114.889128,32.080437)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 14, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 113.761779719557978, 32.282955016369769 ] } },
-{ "type": "Feature", "properties": { "adcode": 411600, "name": "?????????", "center": "(2:114.649653,33.620357)", "centroid": "(2:114.883192,33.721762)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 15, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.883483732722723, 33.720331325388614 ] } },
-{ "type": "Feature", "properties": { "adcode": 411700, "name": "????????????", "center": "(2:114.024736,32.980169)", "centroid": "(2:114.156353,32.922684)", "childrenNu": 10, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 16, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 114.156616010067438, 32.921567989352162 ] } },
-{ "type": "Feature", "properties": { "adcode": 419001, "name": "?????????", "center": "(2:112.590047,35.090378)", "centroid": "(2:112.398673,35.099131)", "childrenNu": 0, "level": "city", "parent": { "adcode": 410000 }, "subFeature": 17, "acroutes": "(2:100000,410000)" }, "geometry": { "type": "Point", "coordinates": [ 112.398567782448978, 35.098864186003553 ] } }
-]
+  "type": "FeatureCollection",
+  "name": "point",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410100,
+        "name": "?????????",
+        "center": "(2:113.665412,34.757975)",
+        "centroid": "(2:113.477391,34.626256)",
+        "childrenNu": 12,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 0,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.477292302277547, 34.625642291696295]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410200,
+        "name": "?????????",
+        "center": "(2:114.341447,34.797049)",
+        "centroid": "(2:114.541763,34.604497)",
+        "childrenNu": 9,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 1,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.541472167913341, 34.603719822651371]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410300,
+        "name": "?????????",
+        "center": "(2:112.434468,34.663041)",
+        "centroid": "(2:112.038509,34.293198)",
+        "childrenNu": 14,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 2,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.037836283392323, 34.291128603687923]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410300,
+        "name": "?????????",
+        "center": "(2:112.434468,34.663041)",
+        "centroid": "(2:112.038509,34.293198)",
+        "childrenNu": 14,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 2,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.024078522160011, 34.781447774856851]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410400,
+        "name": "????????????",
+        "center": "(2:113.307718,33.735241)",
+        "centroid": "(2:113.016514,33.795715)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 3,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.017004011893903, 33.79447196169582]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410500,
+        "name": "?????????",
+        "center": "(2:114.352482,36.103442)",
+        "centroid": "(2:114.358257,35.878529)",
+        "childrenNu": 9,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 4,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.35882062506758, 35.877016295307904]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410600,
+        "name": "?????????",
+        "center": "(2:114.295444,35.748236)",
+        "centroid": "(2:114.31602,35.721499)",
+        "childrenNu": 5,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 5,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.316180857603854, 35.721229921661688]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410700,
+        "name": "?????????",
+        "center": "(2:113.883991,35.302616)",
+        "centroid": "(2:114.095247,35.263966)",
+        "childrenNu": 12,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 6,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.095619762230157, 35.263128393706971]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410800,
+        "name": "?????????",
+        "center": "(2:113.238266,35.23904)",
+        "centroid": "(2:113.137719,35.114644)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 7,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.137421572288346, 35.114159521641959]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410900,
+        "name": "?????????",
+        "center": "(2:115.041299,35.768234)",
+        "centroid": "(2:115.287416,35.809288)",
+        "childrenNu": 6,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 8,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.287043168410719, 35.808460272964481]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 410900,
+        "name": "?????????",
+        "center": "(2:115.041299,35.768234)",
+        "centroid": "(2:115.287416,35.809288)",
+        "childrenNu": 6,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 8,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.499880336644381, 35.904835248590892]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411000,
+        "name": "?????????",
+        "center": "(2:113.826063,34.022956)",
+        "centroid": "(2:113.715606,34.071457)",
+        "childrenNu": 6,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 9,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.715857038254001, 34.071000007629102]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411100,
+        "name": "?????????",
+        "center": "(2:114.026405,33.575855)",
+        "centroid": "(2:113.905678,33.65448)",
+        "childrenNu": 5,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 10,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.905590985326185, 33.654144848027684]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411200,
+        "name": "????????????",
+        "center": "(2:111.194099,34.777338)",
+        "centroid": "(2:111.112608,34.36205)",
+        "childrenNu": 6,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 11,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [111.111719272829845, 34.359811317981951]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411200,
+        "name": "????????????",
+        "center": "(2:111.194099,34.777338)",
+        "centroid": "(2:111.112608,34.36205)",
+        "childrenNu": 6,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 11,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.024078522160011, 34.781447774856851]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411300,
+        "name": "?????????",
+        "center": "(2:112.540918,32.999082)",
+        "centroid": "(2:112.288385,33.044723)",
+        "childrenNu": 13,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 12,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.289420244914382, 33.042480509587342]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411300,
+        "name": "?????????",
+        "center": "(2:112.540918,32.999082)",
+        "centroid": "(2:112.288385,33.044723)",
+        "childrenNu": 13,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 12,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [111.028818782674492, 33.181020196550442]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411300,
+        "name": "?????????",
+        "center": "(2:112.540918,32.999082)",
+        "centroid": "(2:112.288385,33.044723)",
+        "childrenNu": 13,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 12,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.729333, 32.36028566666667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411400,
+        "name": "?????????",
+        "center": "(2:115.650497,34.437054)",
+        "centroid": "(2:115.702245,34.28898)",
+        "childrenNu": 9,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 13,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.703010103997059, 34.287937296916347]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411500,
+        "name": "?????????",
+        "center": "(2:114.075031,32.123274)",
+        "centroid": "(2:114.889128,32.080437)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 14,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.888913482223415, 32.07932490055196]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411500,
+        "name": "?????????",
+        "center": "(2:114.075031,32.123274)",
+        "centroid": "(2:114.889128,32.080437)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 14,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.761779719557978, 32.282955016369769]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411600,
+        "name": "?????????",
+        "center": "(2:114.649653,33.620357)",
+        "centroid": "(2:114.883192,33.721762)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 15,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.883483732722723, 33.720331325388614]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 411700,
+        "name": "????????????",
+        "center": "(2:114.024736,32.980169)",
+        "centroid": "(2:114.156353,32.922684)",
+        "childrenNu": 10,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 16,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.156616010067438, 32.921567989352162]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "adcode": 419001,
+        "name": "?????????",
+        "center": "(2:112.590047,35.090378)",
+        "centroid": "(2:112.398673,35.099131)",
+        "childrenNu": 0,
+        "level": "city",
+        "parent": { "adcode": 410000 },
+        "subFeature": 17,
+        "acroutes": "(2:100000,410000)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.398567782448978, 35.098864186003553]
+      }
+    }
+  ]
 }

@@ -49,7 +49,7 @@ function finish(map) {
   pointerMoveHandler && map.un('pointermove', pointerMoveHandler)
   map && map.removeOverlay(helpTooltip)
   map && map.removeInteraction(draw)
-  map && map.set('mouseStatus',V_MOUSE_STATUS_ENUM.none)
+  map && map.set('mouseStatus',V_MOUSE_STATUS.none)
 }
 
 function clear(map) {
@@ -433,7 +433,7 @@ function init(map, measureType) {
 }
 
 
-import { V_MOUSE_STATUS_ENUM } from '@/VMap/global.js'
+import { V_MOUSE_STATUS } from '@/VMap/global.js'
 import Base from '../Base.js'
 
 export default class MeasureHandler extends Base{
@@ -444,13 +444,13 @@ export default class MeasureHandler extends Base{
 
   measureLength(map = this.map, clearLast = false) {
     debugger
-    map.set('mouseStatus',V_MOUSE_STATUS_ENUM.mesure)
+    map.set('mouseStatus',V_MOUSE_STATUS.mesure)
     clearLast && clear(map)
     init(map, 'length')
   }
 
   measureArea(map = this.map, clearLast = false) {
-    map.set('mouseStatus',V_MOUSE_STATUS_ENUM.mesure)
+    map.set('mouseStatus',V_MOUSE_STATUS.mesure)
     clearLast && clear(map)
     init(map, 'area')
   }

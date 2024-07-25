@@ -1,0 +1,9 @@
+.vmap-theme-light {
+  background-color: rgba(255, 255, 255, 1);
+  color: black;
+}
+
+.vmap-theme-dark {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}

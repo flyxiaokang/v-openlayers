@@ -4,14 +4,14 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:47:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-30 16:26:15
+ * @LastEditTime: 2024-01-29 10:19:52
 -->
 <template>
-  <OlLayer :map-provider="mapProvider" />
+  <Layer :map-provider="mapProvider" />
 </template>
 
 <script setup>
-import OlLayer from '../layer/index.vue'
+import Layer from '../layer/index.vue'
 import { isString } from '@/VMap/public/utils/base/validate'
 
 const props = defineProps({
@@ -29,5 +29,11 @@ const props = defineProps({
     },
   },
 })
+</script>
+
+<script>
+export default {
+  name: 'OlTile',
+}
 </script>
 <style lang="scss" scoped></style>

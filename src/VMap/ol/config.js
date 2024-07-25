@@ -4,20 +4,24 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:44:36
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-28 15:50:40
+ * @LastEditTime: 2023-10-10 16:11:50
  */
-import config from './lib/config/wgs84.config'
+// import config from './lib/config/wgs84.config'
 // import config from './lib/config/webMecator.config'
+import config from './lib/config/default.config'
 
 let mapConfig = config
 
 export function getConfig() {
-    return mapConfig
+  return mapConfig
 }
 
 export function setConfig(config = null) {
-    mapConfig = {
-        ...mapConfig,
-        ...config,
-    }
+  mapConfig = {
+    ...mapConfig,
+    ...config,
+  }
 }
+
+export let isWebmocat = mapConfig.prj === 'EPSG:3857'
+export let isWgs84 = mapConfig.prj === 'EPSG:4326'

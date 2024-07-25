@@ -38,7 +38,7 @@ const defaultPolygonStyle = new Style({
     }),
 })
 
-const V_GEOM_TYPE_ENUM = {
+const V_GEO_TYPE = {
     POINT: 'Point',
     LINE_STRING: 'LineString',
     POLYGON: 'Polygon',
@@ -69,7 +69,7 @@ export function getFeaturesFromGeojson(geojson, options = {
         }
         let type = feature.getGeometry().getType()
         switch (type) {
-            case V_GEOM_TYPE_ENUM.POINT:
+            case V_GEO_TYPE.POINT:
                 if (field) {
                     style = new Style({
                         image: new Circle({
@@ -102,7 +102,7 @@ export function getFeaturesFromGeojson(geojson, options = {
                     style = defaultCircleStyle
                 }
                 break
-            case V_GEOM_TYPE_ENUM.POLYGON:
+            case V_GEO_TYPE.POLYGON:
                 if (field) {
                     style = new Style({
                         // stroke: new Stroke({

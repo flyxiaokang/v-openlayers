@@ -256,10 +256,17 @@ export function removeRepeat(arr) {
   return uniqueArray
 }
 
-export function getRandomRgb(opacity = 1) {
+export function getRandomRgb() {
   return `rgba(${parseInt(Math.random() * 255)},${parseInt(
     Math.random() * 255
-  )},${parseInt(Math.random() * 255)},${opacity})`
+  )},${parseInt(Math.random() * 255)})`
+}
+
+export function getRandomRgba(a = 1) {
+  let r = Math.floor(Math.random() * 256)
+  let g = Math.floor(Math.random() * 256)
+  let b = Math.floor(Math.random() * 256)
+  return `rgba(${r},${g},${b},${a})`
 }
 
 export function getRandomColor(bRgb) {

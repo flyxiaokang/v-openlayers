@@ -1,10 +1,10 @@
 <!--
- * @Description:
+ * @Description: 工具条
  * @Version:
  * @Author: kangjinrui
  * @Date: 2021-09-22 14:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-14 10:38:46
+ * @LastEditTime: 2023-12-15 16:11:45
 -->
 <template>
   <div class="vmap-mapbar" :style="getStyle">
@@ -29,8 +29,12 @@
 <script setup>
 import { getConfig } from '@/VMap/ol/config'
 import { onMounted, ref, toRefs, watch, inject } from 'vue'
-import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
-import { useProps, useEmits, usePosition } from './baseBar'
+import { V_MOUSE_STATUS } from '@/VMap/global'
+import {
+  useProps,
+  useEmits,
+  usePosition,
+} from '@/VMap/public/use/usePosition'
 
 const olHandler = inject('olHandler')
 
@@ -91,7 +95,7 @@ const handleMapTool = (item, index) => {
       break
     case 'pointer':
       olHandler.endDragZoom()
-      olHandler.map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
+      olHandler.map.set('mouseStatus', V_MOUSE_STATUS.none)
       break
     case 'LineString': // 测距
       olHandler.getMeasureHandler().measureLength()
@@ -115,20 +119,20 @@ const handleMapTool = (item, index) => {
   }
 }
 </script>
+
+<script>
+export default {
+  name: 'OlToolbar',
+}
+</script>
 <style scoped>
 .vmap-mapbar {
-  /* position: absolute;
-  top: 70px;
-  right: 17px;
-  width: 36px;
-  text-align: center; */
 }
 
 .vmap-mapbar a {
   background-color: #fff;
   color: black;
   display: block;
-  /* padding: 2px 1px; */
 }
 
 .vmap-mapbar a:hover {
@@ -136,10 +140,8 @@ const handleMapTool = (item, index) => {
 }
 
 .vmap-mapbar a.active {
-  /* background-color: #409eff; */
   color: white;
   border-radius: 5px;
-  /* padding: 5px 0; */
   padding: 5px 0 0 0;
   cursor: pointer;
   font-size: 18px;

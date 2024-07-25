@@ -4,16 +4,13 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:11:12
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-07 14:03:54
+ * @LastEditTime: 2024-06-07 14:59:32
 -->
 <template>
   <div v-show="visible" :id="popupId" :class="getClass">
     <div v-if="showTitle" class="vmap-title">
       <span class="popup-title">{{ title }}</span>
-      <span
-        class="popup-title-close"
-        @click="handleClose"
-      ></span>
+      <span class="popup-title-close" @click="handleClose"></span>
     </div>
     <div :id="contentId" class="vmap-popup-content">
       <slot></slot>
@@ -35,16 +32,17 @@ import {
   onUnmounted,
 } from 'vue'
 
-import { V_MAP_THEME } from '@/VMap/global'
+import { V_THEME } from '@/VMap/global'
+import { getClassByTheme } from '@/VMap/public/use/theme'
 
 const props = defineProps({
   theme: {
     type: String,
-    default: V_MAP_THEME.dark,
+    default: V_THEME.light,
   },
-  visible:{
-    type:Boolean,
-    default:false
+  visible: {
+    type: Boolean,
+    default: false,
   },
   showTitle: {
     type: Boolean,
@@ -77,15 +75,11 @@ const getClass = computed(() => {
   return ['vmap-ol-popup', theme.value]
 })
 
-
-
 onMounted(() => {
-  nextTick((e) => {
-  })
+  nextTick((e) => {})
 })
 
-onUnmounted(() => {
-})
+onUnmounted(() => {})
 </script>
 
 <style lang="scss" scoped>
@@ -97,15 +91,24 @@ onUnmounted(() => {
   bottom: 12px;
   left: -50px;
   min-width: 99px !important;
+  border-radius: 8px;
 }
 
 .vmap-title {
   width: 100%;
   height: 30px;
   line-height: 30px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.light .vmap-title {
   background-color: #409eff;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+}
+
+.dark .vmap-title {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
 }
 
 .vmap-ol-popup:after,
@@ -139,8 +142,6 @@ onUnmounted(() => {
   left: 48px;
   margin-left: -11px;
 }
-
-
 
 .popup-title-close:after {
   content: '✖';
@@ -178,7 +179,7 @@ onUnmounted(() => {
   width: 100%;
   padding: 5px;
   text-align: center;
-  border-radius: 5px;
+  // border-radius: 5px;
   // max-height: 300px;
   // overflow-y: auto;
 }

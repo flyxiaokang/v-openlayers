@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-07 23:19:41
+ * @LastEditTime: 2024-06-20 14:57:22
 -->
 <template>
   <div class="vmap-container">
@@ -13,7 +13,12 @@
     <slot name="popup"></slot>
     <slot></slot>
     <!-- 地图状态条 -->
-    <MapStatus v-if="showStatusbar" :position="position" :zoom="curZoom"/>
+    <MapStatus
+      v-if="showStatusbar"
+      :theme="theme"
+      :position="position"
+      :zoom="curZoom"
+    />
     <!-- popup -->
     <MapPopup
       v-show="showFeaturePopupLocal"
@@ -44,7 +49,7 @@
       </MapPopup>
     </div>
     <!-- identify -->
-    <MapPopup
+    <!-- <MapPopup
       v-show="showIdentify"
       :popupId="popupId + '_identify_'"
       title="属性"
@@ -68,14 +73,42 @@
           />
         </el-tab-pane>
       </el-tabs>
-    </MapPopup>
+    </MapPopup> -->
+
+    <!-- identify -->
+    <OlIdentify
+      title="属性"
+      :theme="identifyConfig.theme"
+      :position="curPosition"
+    >
+      <el-tabs
+        v-model="activeIdentify"
+        style="max-width: 200px"
+        @tab-click="handleClick"
+      >
+        <el-tab-pane
+          v-for="(item, index) in identifyList"
+          :label="item.name"
+          :name="item.name"
+          :key="index"
+        >
+          <TableWidget
+            :style="{ height: identifyConfig.height + 'px' }"
+            :table-header="identifyConfig.header"
+            :show-header="identifyConfig.showHeader"
+            :table-data="item.attributes"
+          />
+        </el-tab-pane>
+      </el-tabs>
+    </OlIdentify>
+
     <!-- 绘制 -->
-    <MapDraw
+    <!-- <MapDraw
       v-if="showMapDraw"
       class="vmap-drawer"
       @draw-change="handleDrawChange"
       @close="handleCloseDraw"
-    />
+    /> -->
     <!-- 图层管理 -->
     <!-- <transition name="el-zoom-in-top">
       <Draggable
@@ -102,6 +135,8 @@ import { getOlHandler } from '@/VMap/ol/init'
 import { setConfig, getConfig } from '@/VMap/ol/config'
 import VUtils from '@/VMap/public/utils/base'
 
+import OlIdentify from '@/VMap/ol/v3/components/layer/popup/Identify.vue'
+
 import MapPopup from './popup/index.vue'
 // import MapLayerManager from '@/VMap/public/components/Map/MapLayerManager.vue'
 import MapStatus from '@/VMap/public/components/Map/MapStatus.vue'
@@ -109,10 +144,16 @@ import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
 
 import TableWidget from '@/VMap/components/Table/index.vue'
 //import Draggable from '@/VMap/components/Draggable/index.vue'
-import { V_MOUSE_STATUS_ENUM } from '@/VMap/global'
+import { V_MOUSE_STATUS } from '@/VMap/global'
+import { V_THEME } from '@/VMap/global'
+import { useEmits } from '@/VMap/public/use/useEvent'
 
 const olInstance = getOlHandler()
+
+const curMapCenter = ref([])
+
 provide('olHandler', olInstance)
+provide('mapCenter', curMapCenter)
 
 const props = defineProps({
   mapConfig: {
@@ -121,13 +162,17 @@ const props = defineProps({
       return getConfig()
     },
   },
+  theme: {
+    type: String,
+    default: V_THEME.light,
+  },
   showFeaturePopup: {
     type: Boolean,
     default: false,
   },
   singlePopupTableHeight: {
     type: Number,
-    default: 300,
+    default: 200,
   },
   singlePopupTableHeader: {
     type: Array,
@@ -145,25 +190,25 @@ const props = defineProps({
       ]
     },
   },
-  multiplePopupTableHeight:{
+  multiplePopupTableHeight: {
     type: Number,
     default: 200,
   },
-  multiplePopupTableHeader:{
-    type:Array,
-    default(){
+  multiplePopupTableHeader: {
+    type: Array,
+    default() {
       return [
-          {
-            label: '属性',
-            value: 'label',
-          },
-          {
-            label: '值',
-            value: 'value',
-            width: 100,
-          },
-        ]
-    }
+        {
+          label: '属性',
+          value: 'label',
+        },
+        {
+          label: '值',
+          value: 'value',
+          width: 100,
+        },
+      ]
+    },
   },
   multiplePopupConfig: {
     type: Object,
@@ -197,19 +242,35 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  showIcons: {
-    type: Boolean,
-    default: false,
-  },
-  showToolbar: {
-    type: Boolean,
-    default: false,
-  },
-  showBasemapbar: {
-    type: Boolean,
-    default: false,
+  identifyConfig: {
+    type: Object,
+    default() {
+      return {
+        height: 200,
+        header: [
+          {
+            label: '属性',
+            value: 'label',
+          },
+          {
+            label: '值',
+            value: 'value',
+          },
+        ],
+        showHeader: false,
+        theme: 'light',
+      }
+    },
   },
   showStatusbar: {
+    type: Boolean,
+    default: true,
+  },
+  showBasemap: {
+    type: Boolean,
+    default: true,
+  },
+  dragPan: {
     type: Boolean,
     default: true,
   },
@@ -217,8 +278,8 @@ const props = defineProps({
     type: Object,
     default() {
       return {
-        showBasemap: true,
         zoom: true,
+        scaleLine: true,
       }
     },
   },
@@ -230,19 +291,14 @@ const {
   multiplePopup,
   mapConfig,
   controls,
+  showBasemap,
   showFeaturePopup,
   showMultiplePopup,
   identify,
+  dragPan,
 } = toRefs(props)
 
-const emits = defineEmits([
-  'ready',
-  'mouse-move',
-  'mouse-click',
-  'mouse-dbclick',
-  'mouse-moveend',
-  'draw-end',
-])
+const emits = defineEmits(useEmits)
 
 const target = `${VUtils.uuidOnlyStr()}-vmap-id`
 let mapReady = false
@@ -323,19 +379,27 @@ const checkMultiplePopup = (nv) => {
 const handleClick = () => {}
 
 const defaultCheckLayerIds = ref([])
-let showMapDraw = ref(false)
+let showMapDraw = ref(true)
 setConfig(mapConfig.value)
 
 const curZoom = ref(0)
 onMounted(() => {
   olInstance.target = target
-  olInstance.initMap((map) => {
-    mapReady = true
-    map.set('mouseStatus', V_MOUSE_STATUS_ENUM.none)
-    emits('ready', olInstance)
-    curZoom.value = map.getView().getZoom()
-    bindEvent()
-  }, controls.value)
+  olInstance.initMap(
+    (map) => {
+      mapReady = true
+      map.set('mouseStatus', V_MOUSE_STATUS.none)
+      emits('ready', olInstance)
+      curZoom.value = map.getView().getZoom()
+      bindEvent()
+    },
+    {
+      controls: controls.value,
+      showBasemap: showBasemap.value,
+      dragPan: dragPan.value,
+      view: mapConfig.value.defaultView,
+    }
+  )
 })
 
 // 事件
@@ -359,8 +423,10 @@ const bindEvent = () => {
   olInstance.registerMouseMoveEnd((e) => {
     emits('mouse-moveend', e)
     curZoom.value = olInstance.map.getView().getZoom()
+    curMapCenter.value = olInstance.map.getView().getCenter()
   })
 }
+const curPosition = ref([])
 
 // i查询
 const handleIdentify = (e) => {
@@ -369,7 +435,8 @@ const handleIdentify = (e) => {
   if (features.length === 0) {
     return
   }
-  openIdentifyPopup(coordinate)
+  // openIdentifyPopup(coordinate)
+  curPosition.value = coordinate
   identifyList.value = []
   features.forEach((feature, index) => {
     activeIdentify.value = '要素_' + 1
@@ -645,6 +712,34 @@ export default {
 }
 
 :deep(.ol-scale-line.ol-unselectable) {
-  bottom: 35px !important;
+  // left: calc(100% - 120px);
+  left: 10px;
+  padding: 4px;
+  bottom: 0px;
+  background-color: rgb(255, 255, 255);
+  // width: 100px;
 }
+
+:deep(.ol-scale-line-inner) {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+// :deep(.vmap-ol-popup.dark .el-table tr) {
+//   background-color: rgba(0, 0, 0, 0.5);
+//   color: white;
+// }
+
+// :deep(.vmap-ol-popup.dark .el-scrollbar__wrap) {
+//   background-color: rgba(0, 0, 0, 0.5);
+//   color: white;
+// }
+
+:deep(.vmap-ol-popup.dark .el-tabs__item.is-active) {
+  color: #dddddd;
+}
+</style>
+
+<style>
+@import url(../../../public/static/css/theme.css);
 </style>

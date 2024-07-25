@@ -15,8 +15,11 @@ declare module '@vue/runtime-core' {
     IconIcBaselineAirplanemodeActive: typeof import('~icons/ic/baseline-airplanemode-active')['default']
     IconVcClean: typeof import('~icons/vc/clean')['default']
     IconVcClose: typeof import('~icons/vc/close')['default']
+    IconVcMax: typeof import('~icons/vc/max')['default']
+    IconVcMin: typeof import('~icons/vc/min')['default']
     IconVcPoint: typeof import('~icons/vc/point')['default']
     IconVcPolygon: typeof import('~icons/vc/polygon')['default']
     IconVcPolyline: typeof import('~icons/vc/polyline')['default']
+    IconVcToolbox: typeof import('~icons/vc/toolbox')['default']
   }
 }

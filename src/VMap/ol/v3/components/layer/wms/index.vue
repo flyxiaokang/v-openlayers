@@ -4,13 +4,13 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 19:43:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-30 10:50:08
+ * @LastEditTime: 2024-06-06 15:56:00
 -->
 <template>
-  <OlTile v-bind="$attrs" v-on="$listeners" :map-provider="getMapProvider" />
+  <Layer :map-provider="getMapProvider" />
 </template>
 <script setup>
-import OlTile from '../layer/index.vue'
+import Layer from '../layer/index.vue'
 import { ref, toRefs, computed } from 'vue'
 import { isString } from '@/VMap/public/utils/base/validate'
 
@@ -28,5 +28,11 @@ const { mapProvider } = toRefs(props)
 const getMapProvider = computed(() => {
   return 'wms' + mapProvider.value.toLowerCase()
 })
+</script>
+
+<script>
+export default {
+  name: 'OlWms',
+}
 </script>
 <style lang="scss" scoped></style>

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-10 15:42:18
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-05 22:16:26
+ * @LastEditTime: 2024-06-07 11:52:36
  */
 import {
   Style,
@@ -102,10 +102,13 @@ export function getStyle(options = {}) {
       color = 'white',
       backgroundColor,
       fontSize = '14px',
-      padding = [5, 5, 5, 5],
-      offsetX = 20,
-      offsetY = -20,
+      padding = [0, 5, 0, 5],
+      offsetX = 0,
+      offsetY = -22,
       textFormatter = getText,
+      rotation = 0,
+      textAlign = 'center',
+      justify = 'center'
     } = text
     try {
       const text = new Text({
@@ -122,6 +125,9 @@ export function getStyle(options = {}) {
             })
           : null,
         padding,
+        textAlign,
+        rotation,
+        justify
       })
       pointStyle.setText(text)
       return pointStyle

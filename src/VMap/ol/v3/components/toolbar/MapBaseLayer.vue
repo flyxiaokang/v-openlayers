@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-09-22 19:52:30
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-04 14:38:53
+ * @LastEditTime: 2024-01-02 14:01:33
 -->
 <template>
   <div class="vmap-base-layer" :style="getStyle">
@@ -23,7 +23,7 @@
           <label for="">{{ item.label }}</label>
           <div class="image">
             <div class="image-2">
-              <img
+              <!-- <img
                 v-for="(layer, layerIndex) in item.children"
                 :key="layerIndex"
                 :src="
@@ -31,12 +31,18 @@
                   (layer.children ? picBase + layer.children[0].image : '')
                 "
                 :class="
-                  curLayerIndex === layer.id || layer.visible === '1'
+                  curLayerIndex === item.id || layer.visible === '1'
                     ? 'active'
                     : ''
                 "
                 alt=""
-                @click="handleToggleLayer(layer, layer.id)"
+                @click="handleToggleLayer(layer, layer.id, item)"
+              /> -->
+              <img
+                :src="item.children[0].image"
+                alt=""
+                :class="curLayerIndex === item.id ? 'active' : ''"
+                @click="handleToggleLayer(item)"
               />
             </div>
           </div>
@@ -61,7 +67,7 @@ const emits = defineEmits(['change'])
 
 const getStyle = usePosition(toRefs(props))
 
-let defaultId = getConfig().defaultBaseMapId
+let defaultId = getConfig().defaultBaseLayerId
 let curLayerIndex = ref(defaultId)
 let showLayers = ref(false)
 
@@ -72,22 +78,32 @@ const handleMouseover = () => {
   showLayers.value = true
 }
 
-const handleToggleLayer = (layer, index) => {
-  let ids = []
-  if (layer.hasOwnProperty('children') && layer.children.length > 0) {
-    layer.children.forEach((element) => {
-      ids.push(element.id)
-    })
-  } else {
-    ids.push(layer.id)
-  }
-  curLayerIndex.value = index
-  toggleMap(ids)
+const handleToggleLayer = (item) => {
+  // let ids = []
+  // if (layer.hasOwnProperty('children') && layer.children.length > 0) {
+  //   layer.children.forEach((element) => {
+  //     ids.push(element.id)
+  //   })
+  // } else {
+  //   ids.push(layer.id)
+  // }
+  curLayerIndex.value = item.id
+  toggleMap(item)
 }
 
-const toggleMap = (layerid) => {
-  olHandler.toggleBaseLayer(layerid)
-  emits('change', layerid)
+const toggleMap = (item) => {
+  // olHandler.toggleBaseLayer(item)
+  const layers = olHandler.getBaseLayer(item)
+  layers.forEach((layer) => {
+    olHandler.map.addLayer(layer)
+  })
+  emits('change', item.id)
+}
+</script>
+
+<script>
+export default {
+  name: 'OlBasemap',
 }
 </script>
 <style scoped>

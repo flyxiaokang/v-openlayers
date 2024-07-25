@@ -1,35 +1,75 @@
 <!--
- * @Description: 
+ * @Description: 绘制工具
  * @Version: 
  * @Author: kangjinrui
  * @Date: 2023-07-07 10:49:43
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-07-07 10:49:45
+ * @LastEditTime: 2024-04-10 11:11:30
 -->
 <template>
-  <el-radio-group v-model="defaultDraw" size="large">
-    <el-radio-button v-for="item in drawOptions" :label="item.value">{{
-      item.label
-    }}</el-radio-button>
-  </el-radio-group>
+  <MapDraw @draw-change="handleDrawChange" @close="handleCloseDraw" />
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, inject, toRefs } from 'vue'
+import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
 
-const defaultDraw = ref('')
-const drawOptions = [
-  {
-    label: '点',
-    value: 'Point',
+import { getOlHandler } from '@/VMap/ol/init'
+
+const props = defineProps({
+  snapEnable: {
+    type: Boolean,
+    default: false,
   },
-  {
-    label: '线',
-    value: 'Polyline',
+  modifyEnable: {
+    type: Boolean,
+    default: false,
   },
-  {
-    label: '面',
-    value: 'Polygon',
+  onceOnly: {
+    type: Boolean,
+    default: false,
   },
-]
+  selectEnable: {
+    type: Boolean,
+    default: false,
+  },
+})
+const emits = defineEmits(['draw-end', 'close'])
+
+const { snapEnable, selectEnable, modifyEnable, onceOnly } = toRefs(props)
+
+let olHandler = getOlHandler()
+olHandler = inject('olHandler')
+
+// 绘制
+const handleDrawChange = (type) => {
+  if (type === 'End') {
+    olHandler.getDrawHandler()?.endDraw()
+  } else if (type === 'Clear') {
+    olHandler.getDrawHandler()?.clear()
+  } else {
+    olHandler.getDrawHandler().drawByType({
+      type,
+      snapEnable: snapEnable.value,
+      modifyEnable: modifyEnable.value,
+      onceOnly: onceOnly.value,
+      selectEnable: selectEnable.value,
+      drawEndHandle: (e) => {
+        emits('draw-end', e)
+      },
+    })
+  }
+}
+
+const handleCloseDraw = () => {
+  olHandler.getDrawHandler()?.clear()
+  olHandler.getDrawHandler()?.endDraw()
+  emits('close')
+}
+</script>
+
+<script>
+export default {
+  name: 'OlDrawer',
+}
 </script>
 <style lang="scss" scoped></style>
