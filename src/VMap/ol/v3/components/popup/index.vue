@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:11:12
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-07 14:59:32
+ * @LastEditTime: 2024-10-02 10:31:08
 -->
 <template>
   <div v-show="visible" :id="popupId" :class="getClass">
@@ -87,7 +87,7 @@ onUnmounted(() => {})
   position: absolute;
   background-color: rgba(255, 255, 255, 0) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  border: 1px solid #cccccc;
+  // border: 1px solid #cccccc;
   bottom: 12px;
   left: -50px;
   min-width: 99px !important;
@@ -166,20 +166,22 @@ onUnmounted(() => {})
 }
 
 .light .vmap-popup-content {
-  background-color: white;
+  // background-color: white;
+  background: aliceblue;
   color: black;
 }
 
 .dark .vmap-popup-content {
-  background-color: rgba(0, 0, 0, 0.5);
+  // background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
 
 .vmap-popup-content {
   width: 100%;
-  padding: 5px;
+  // padding: 3px 3px;
   text-align: center;
-  // border-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   // max-height: 300px;
   // overflow-y: auto;
 }

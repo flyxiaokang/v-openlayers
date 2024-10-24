@@ -4,12 +4,12 @@
  * @Author: kangjinrui
  * @Date: 2024-06-19 16:51:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-16 10:34:32
+ * @LastEditTime: 2024-10-18 18:22:34
 -->
 
 <template>
   <OlMap
-    :map-config="mapConfig"
+    :map-config="_mapConfig"
     :style="getStyle"
     theme="light"
     :show-statusbar="false"
@@ -53,18 +53,28 @@
   </OlMap>
 </template>
 <script setup>
-import { getConfig } from '@/VMap/ol/config'
 import OlMap from '@/VMap/ol/v3/components/OlMap.vue'
 import { uuidOnlyStr } from '@/VMap/public/utils/base/string'
 
 import { ref, onMounted, computed, toRefs, inject, watch } from 'vue'
-import { toLonLat } from 'ol/proj'
-import { OlHandler, VUtils } from '@/entry/ol.entry'
+import VcUtils from '@/VMap/public/utils/base/index'
+import { OlHandler } from '@/VMap/ol/init'
+import { nextTick } from 'vue'
+
+import { useProps, useEmits, usePosition } from '@/VMap/public/use/usePosition'
 
 const olHandlerParent = inject('olHandler')
+const mapConfig = inject('mapConfig')
+
 const emits = defineEmits(['ready'])
+const eagleId = ref('vmap-eye-' + uuidOnlyStr(8))
 
 const props = defineProps({
+  ...useProps,
+  position: {
+    type: String,
+    default: 'bottom-right',
+  },
   initWidth: {
     type: Number,
     default: 250,
@@ -92,9 +102,17 @@ const props = defineProps({
       }
     },
   },
+  expand: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const { initWidth, initHeight, initZoom, initCenter } = toRefs(props)
+const { initWidth, initHeight, initZoom, initCenter, expand } = toRefs(props)
+
+const getPosition = usePosition(toRefs(props))
+// const getStyle = ref({
+// })
 
 const eyeWidth = 40
 const mapCenter = inject('mapCenter')
@@ -109,19 +127,24 @@ watch(mapCenter, (nv, ov) => {
   }
 })
 
-const eagleId = ref('vmap-eagle-eye-' + uuidOnlyStr(5))
-
-const c = VUtils.deepClone(getConfig())
+const c = VcUtils.deepClone(mapConfig)
 c.defaultView.zoom = initZoom.value
 c.defaultView.minZoom = initZoom.value
 c.defaultView.maxZoom = initZoom.value
 if (initCenter.value.length === 2) {
   c.defaultView.center = initCenter.value
 }
-const mapConfig = c
+const _mapConfig = ref(c)
 
 onMounted(() => {
-  bindEvent()
+  nextTick(() => {
+    if(!expand.value){
+      minWindow()
+    }
+    setTimeout(() => {
+      bindEvent()
+    }, 500)
+  })
 })
 
 let olHandler = new OlHandler()
@@ -132,7 +155,7 @@ const handleMapReady = (e) => {
 
 const windowWidth = ref(initWidth.value)
 const windowHeight = ref(initHeight.value)
-const isMin = ref(false)
+const isMin = ref(!expand.value)
 const minWindow = () => {
   isMin.value = true
   windowWidth.value = 20
@@ -146,6 +169,7 @@ const maxWindow = () => {
 
 const getStyle = computed(() => {
   return {
+    ...getPosition.value,
     width: windowWidth.value + 'px',
     height: windowHeight.value + 'px',
     'border-radius': '6px',
@@ -206,7 +230,7 @@ const bindEvent = () => {
     dv.style.cursor = 'move'
   }
   //鼠标移动
-  window.onmousemove = function (e) {
+  dv.onmousemove = function (e) {
     if (isDown == false) {
       return
     }
@@ -241,8 +265,13 @@ const bindEvent = () => {
 
 const updateMapCenter = (p) => {
   const a = olHandler.map.getCoordinateFromPixel(p)
-  // console.log('.....', p, a, toLonLat(a))
   olHandlerParent.map.getView().setCenter(a)
+}
+</script>
+
+<script>
+export default {
+  name: 'OlEagle',
 }
 </script>
 <style lang="scss" scoped>

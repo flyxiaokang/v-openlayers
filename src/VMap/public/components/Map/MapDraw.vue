@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-03-14 14:09:37
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-28 11:42:55
+ * @LastEditTime: 2024-10-18 18:05:14
 -->
 
 <template>
@@ -23,7 +23,7 @@
         <IconVcClean /> </el-icon
     ></el-button>
     <el-button type="danger" circle @click="handleClose">
-      <el-icon class="custom-class" size="22"> <IconVcClose /> </el-icon
+      <el-icon class="custom-class" size="14"> <IconVcClose /> </el-icon
     ></el-button>
   </div>
 </template>

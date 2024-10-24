@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-04-19 15:03:21
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-10-30 15:58:17
+ * @LastEditTime: 2024-10-01 09:13:29
 -->
 
 <template>
@@ -17,13 +17,8 @@
       border
       :header-cell-style="handleHeaderStyle"
     >
-      <!-- <el-table-column
-                type="index"
-                label="序号"
-                width="80"
-                align="center"
-            >
-            </el-table-column> -->
+      <el-table-column v-if="showIndex" type="index" label="序号" width="80" align="center">
+      </el-table-column>
       <el-table-column
         v-for="(item, index) in tableHeader"
         :type="item.type || ''"
@@ -57,14 +52,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
+    <!-- <el-pagination
       v-if="showPagination"
       small
       background
       layout="prev, pager, next"
       :total="1000"
       style="margin: 5px 0; float: right"
-    />
+    /> -->
   </div>
 </template>
 
@@ -73,6 +68,10 @@ import { onMounted, reactive, ref, toRefs } from 'vue'
 import { layoutUpdate } from '@/VMap/public/utils/advanced/layout'
 
 const props = defineProps({
+  showIndex: {
+    type: Boolean,
+    default: false,
+  },
   showPagination: {
     type: Boolean,
     default: false,
@@ -115,7 +114,7 @@ const handleHeaderStyle = () => {
 }
 
 onMounted(() => {
-  layoutUpdate({ tableHeight, container: tableClass.value, offset: -30 })
+  layoutUpdate({ tableHeight, container: tableClass.value, offset: -5 })
 })
 
 const handleClick = (item, row) => {

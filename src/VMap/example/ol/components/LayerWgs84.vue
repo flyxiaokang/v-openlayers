@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-22 20:17:21
+ * @LastEditTime: 2024-10-24 17:48:20
 -->
 <template>
   <div style="width: 100%; height: 100%">
@@ -18,6 +18,8 @@
         <el-checkbox v-model="vectorTileVisibleValue">vectorTile</el-checkbox>
         <el-checkbox v-model="arcgisImageVisibleValue">arcgisimage</el-checkbox>
         <el-checkbox v-model="wmsVisibleValue">wms</el-checkbox>
+        <el-checkbox v-model="popupVisibleValue">popup显隐</el-checkbox>
+        <el-button @click="handleAddPopup">增加</el-button>
       </div>
       <div>
         <el-button type="primary" size="small" @click="handleChangePolygon"
@@ -38,6 +40,7 @@
     <OlMap
       style="height: calc(100% - 100px)"
       theme="light"
+      use-element-plus
       :map-config="mapConfig"
       @ready="handleMapReady"
       @mouse-click="handleMouseClick"
@@ -61,7 +64,26 @@
 
       <!-- popup -->
       <OlPopup title="属性" theme="light" :position="curPosition">
-        <p>自定义内容</p>
+        <label>自定义内容</label>
+      </OlPopup>
+
+      <OlPopup
+        v-if="popupVisibleValue"
+        v-for="item in popups"
+        title="属性"
+        :show-title="false"
+        :position="item.position"
+      >
+        <div
+          style="
+            width: 100%;
+            height: 60px;
+            background: #8dd9b5;
+            border-radius: 5px;
+          "
+        >
+          {{ item.label }}
+        </div>
       </OlPopup>
 
       <!-- <OlPopup
@@ -85,11 +107,9 @@
         @select-change="handleSelectChange"
       />
 
-      <!-- :cluster-options="clusterOptions" -->
-
       <OlVector
-        :visible="visibleValue"
         :features="MultLinesJson"
+        :visible="visibleValue"
         :modifiable="modifyableValue"
         :layer-style="lineStyle"
         :z-index="104"
@@ -97,8 +117,8 @@
       />
 
       <OlVector
-        :visible="visibleValue"
         :features="PolygonJson"
+        :visible="visibleValue"
         :modifiable="modifyableValue"
         :z-index="103"
         :layer-style="polygonStyle"
@@ -130,23 +150,26 @@
         @select-change="handleSelectChange"
       />
 
+      <!-- tianditu -->
       <OlTdt
-        map-style="img"
+        map-style="vec"
         :visible="tdtVisibleValue"
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
+        :z-index="10"
       />
       <OlTdt
-        map-style="img_label"
+        map-style="vec_label"
         :visible="tdtVisibleValue"
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
+        :z-index="11"
       />
 
       <!-- supermap webmocat -->
-      <OlTile
+      <!-- <OlTile
         map-provider="supermap"
         :url="superMapWmtsUrl"
         :request-params="requestParamsWebmocat"
@@ -154,23 +177,23 @@
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
-      />
+      /> -->
 
-      <OlTile
+      <!-- <OlTile
         map-provider="wmts"
         :url="wmtsUrl"
         :request-params="requestParamsWmts"
         :visible="wmtsVisibleValue"
         :opacity="opacity"
-      />
+      /> -->
 
-      <OlVectortile
+      <!-- <OlVectortile
         :url="vectorTileUrl"
         :layer-style="vectorTileStyle"
         :request-params="vectorTileParams"
         :visible="vectorTileVisibleValue"
         :opacity="opacity"
-      />
+      /> -->
 
       <!-- <OlVectortile
         :url="vectorTileUrlMapbox"
@@ -179,20 +202,20 @@
         :opacity="opacity"
       /> -->
 
-      <OlArcgis
+      <!-- <OlArcgis
         :url="arcgisImageUrl"
         :visible="arcgisImageVisibleValue"
         opacity="0.6"
         z-index="100"
-      />
+      /> -->
 
-      <OlArcgis
+      <!-- <OlArcgis
         map-provider="tile"
         :url="arcgisTileUrl"
         :visible="arcgisImageVisibleValue"
         opacity="0.6"
         z-index="99"
-      />
+      /> -->
 
       <!-- <OlTile
         map-provider="arcgistile"
@@ -201,62 +224,64 @@
         :opacity="opacity"
       /> -->
 
-      <OlWms
+      <!-- <OlWms
         map-provider="image"
         :url="wmsUrl"
         :visible="wmsVisibleValue"
         :request-params="wmsRequest"
         :opacity="opacity"
-      />
+      /> -->
 
-      <MapDrawer
+      <OlDrawer
         class="vmap-drawer"
         :snap-enable="true"
-        :once-only="true"
+        :once-only="false"
         @draw-end="handleDrawend"
-      ></MapDrawer>
+      ></OlDrawer>
 
-      <!-- <OlEagle class="vmap-eagle"></OlEagle> -->
+      <!-- 鹰眼 -->
+      <OlEagle class="vmap-eagle" :offset="[0,30]" expand></OlEagle>
     </OlMap>
   </div>
 </template>
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import OlMap from '@/VMap/ol/v3/components/OlMap.vue'
-import OlBasemap from '@/VMap/ol/v3/components/toolbar/MapBaseLayer.vue'
-import OlToolbar from '@/VMap/ol/v3/components/toolbar/MapBar.vue'
-import OlPopup from '@/VMap/ol/v3/components/layer/popup/index.vue'
-import MapDrawer from '@/VMap/ol/v3/components/toolbar/MapDrawer.vue'
 
-import OlOverlay from '@/VMap/ol/v3/components/layer/overlay/index.vue'
-import OlVector from '@/VMap/ol/v3/components/layer/vector/index.vue'
-import OlTile from '@/VMap/ol/v3/components/layer/tile/index.vue'
-import OlTdt from '@/VMap/ol/v3/components/layer/tdt/index.vue'
-import OlSupermap from '@/VMap/ol/v3/components/layer/supermap/index.vue'
-import OlWms from '@/VMap/ol/v3/components/layer/wms/index.vue'
-import OlArcgis from '@/VMap/ol/v3/components/layer/arcgis/index.vue'
-import OlVectortile from '@/VMap/ol/v3/components/layer/vectorTile/index.vue'
+// com
+import {
+  OlMap,
+  OlBasemap,
+  OlToolbar,
+  OlDrawer,
+  OlEagle,
+  OlPopup,
+  OlOverlay,
+  OlVector,
+  OlTile,
+  OlTdt,
+  OlSupermap,
+  OlArcgis,
+  OlWms,
+  OlVectortile,
+  VueDraggable,
+} from '@/VMap/ol/v3/components/index'
 
-import OlEagle from '@/VMap/ol/v3/components/eagle/index.vue'
-
+// wkt
 import PointsJson from '../../data/wkt/points.json'
 import MultLinesJson from '../../data/wkt/multlines.json'
 import MultPolygonsJson from '../../data/wkt/multpolygons.json'
-import VcUtils from '../../../public/utils/base/index'
-
+// geojson
 import PolygonGeojson from '../../data/geojson/polygon.json'
 import PolylineGeojson from '../../data/geojson/polyline.json'
 import PointGeojson from '../../data/geojson/point.json'
 
-import { getOlHandler } from '@/VMap/ol/init'
-import VUtils from '@/VMap/public/utils/base'
-
-
-import mapConfig from '../mapConfig-4326'
+// tool
+import VUtils from '@/VMap/public/utils/base/index'
+import { OlHandler } from '@/VMap/ol/init'
+import mapConfig from '../config/mapConfig-4326'
 
 const opacity = ref(1)
-
-let olHandler = getOlHandler()
+let olHandler = new OlHandler()
 const handleMapReady = (e) => {
   olHandler = e
 }
@@ -276,7 +301,7 @@ const showOverlay = (e) => {
   for (const key in properties) {
     if (Object.hasOwnProperty.call(properties, key)) {
       const element = properties[key]
-      if (VcUtils.isString(element)) {
+      if (VUtils.isString(element)) {
         featureProperties[key] = element
       }
     }
@@ -288,11 +313,11 @@ const showOverlay = (e) => {
 }
 
 const handleMouseClick = (e) => {
-  console.log(e, olHandler)
+  // console.log('mouse-click===',e, olHandler.map.get('mouseStatus'))
   // overlay
   // showOverlay(e)
   // popup
-  // showFeaturePopup(e)
+  showFeaturePopup(e)
 }
 
 const tableHeader = [
@@ -308,6 +333,29 @@ const tableHeader = [
   },
 ]
 
+const popupVisibleValue = ref(false)
+const popups = ref([
+  {
+    label: '我在新疆',
+    position: [88, 36],
+  },
+  {
+    label: '我在湖南',
+    position: [110, 27],
+  },
+  {
+    label: '我在北京',
+    position: [116, 39],
+  },
+])
+const handleAddPopup = () => {
+  const lonlat = [parseInt(20 * Math.random() + 100), parseInt(10 * Math.random() + 30)]
+  popups.value.push({
+    label: '我在' + lonlat.join(','),
+    position: lonlat,
+  })
+}
+
 const featurePopup = ref({})
 const curPosition = ref([])
 const curProperties = ref([])
@@ -320,11 +368,11 @@ const showFeaturePopup = (e) => {
   }
   const properties = features[0].getProperties()
   curPosition.value = coordinate
-  curProperties.value = VcUtils.object2Array(properties)
+  curProperties.value = VUtils.object2Array(properties)
   console.log(curProperties.value)
   // featurePopup.value = {
   //   location: coordinate,
-  //   attributes: VcUtils.object2Array(properties),
+  //   attributes: VUtils.object2Array(properties),
   // }
 }
 
@@ -382,12 +430,12 @@ const polygonStyle = ref({
 const visibleValue = ref(true)
 const modifyableValue = ref(false)
 const handleSelectChange = () => {}
-const PolygonJson = ref(MultPolygonsJson)
+const PolygonJson = ref(VUtils.deepClone(MultPolygonsJson))
 const handleChangePolygon = () => {
   PolygonJson.value.forEach((p) => {
     p['style'] = {
       fill: {
-        color: VcUtils.getRandomRgb(0.6),
+        color: VUtils.getRandomRgb(0.6),
       },
       stroke: {
         width: 0,
@@ -527,11 +575,11 @@ const handleDrawend = (e) => {
 }
 
 .vmap-eagle {
-  position: absolute;
-  bottom: 50px;
+  /* position: absolute;
+  bottom: 60px;
   right: 70px;
   width: 230px;
   height: 230px;
-  z-index: 1999;
+  z-index: 1999; */
 }
 </style>

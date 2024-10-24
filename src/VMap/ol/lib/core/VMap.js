@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-12-27 14:28:14
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-28 11:10:49
+ * @LastEditTime: 2024-07-24 15:38:56
  */
 import Base from './Base'
 import 'ol/ol.css'
@@ -19,11 +19,10 @@ import { always } from 'ol/events/condition'
 import Feature from 'ol/Feature'
 import Geometry from 'ol/geom/Geometry'
 import { getArea, getDistance, getLength } from 'ol/sphere'
-// import Interaction from 'ol/interaction/Interaction.js';
 import { defaults as defaultInteraction } from 'ol/interaction/defaults'
 import { fromLonLat } from 'ol/proj'
 
-import VcUtils from '@/VMap/public/utils/base'
+import VcUtils from '@/VMap/public/utils/base/index'
 import LayerHandler from './plugins/LayerHandler'
 import DrawHandler from './plugins/DrawHandler'
 import DrawConditions from './plugins/DrawConditions'
@@ -35,21 +34,14 @@ import * as GeometryHandler from './plugins/GeometryHandler'
 import * as TransHandler from './plugins/TransformHandler'
 import kriging from './plugins/KrigingHandler'
 
-import { uuid, uuidOnlyStr } from '@/VMap/public/utils/base/string'
 import { V_MAP_PROVIDER, V_MOUSE_STATUS, getTdtUrl } from '@/VMap/global'
 // 自定义配置文件
 import { getConfig } from '@/VMap/ol/config'
 import { Point } from 'ol/geom'
-import {
-  Style,
-  Fill,
-  Stroke,
-  Circle as CircleStyle,
-  Text,
-  Icon,
-} from 'ol/style'
+import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style'
 
 import * as StyleHandler from './plugins/StyleHandler'
+import { deepClone } from '@/VMap/public/utils/base/common'
 
 class VMap extends Base {
   // map 对象
@@ -76,15 +68,16 @@ class VMap extends Base {
   constructor(target = 'map-view') {
     super()
     this.target = target
+    this.mapConfig = getConfig()
     // 地图事件
     this.mouseMoveHandle = null
     this.mouseClickHandle = null
     this.mouseDbClickHandle = null
     this.mouseMoveEndHandle = null
     // 坐标系
-    this.prj = getConfig().prj
+    this.prj = this.mapConfig.prj
     // 地图范围
-    this.mapInitExtent = getConfig().defaultView
+    this.mapInitExtent = this.mapConfig.defaultView
     this.mouseStatusKey = 'mouseStatus'
     // 默认符号
     this.overlay = null
@@ -104,8 +97,6 @@ class VMap extends Base {
     this.kriging = kriging
 
     this.baseLayerCollection = {}
-
-    this.getLayerHandler(this.map)
   }
 
   static whoami() {
@@ -177,7 +168,7 @@ class VMap extends Base {
    * 通过配置文件【mapConfig】，创建地图
    */
   initMap(
-    callback,
+    mapConfig,
     options = {
       controls: {},
       showBasemap: true,
@@ -187,17 +178,24 @@ class VMap extends Base {
     if (!this.target) {
       return
     }
-    const { controls, showBasemap, view, dragPan } = options
+    this.mapConfig = deepClone(mapConfig)
+    this.getLayerHandler()
+    const { controls, showBasemap, dragPan } = options
+    const {
+      baseLayers,
+      prj,
+      defaultBaseLayerId,
+      defaultView: view,
+    } = this.mapConfig
     if (view.projection === 'EPSG:3857') {
       view.center = fromLonLat(view.center)
     }
-    console.log('view......', view)
-    const { baseLayers, prj, defaultBaseLayerId } = getConfig()
+    // console.log('view......', view)
+    this.prj = prj
     const layers = []
     // 底图集合
     const baseLayersList = []
     VcUtils.tree2list(baseLayers, baseLayersList)
-
     // baseLayersList.forEach((options) => {
     //   // baseMap  标识底图图层
     //   if (options.url) {
@@ -245,16 +243,14 @@ class VMap extends Base {
         })
       )
     }
-
     this.layerHandler.setMap(this.map)
-    setTimeout(() => {
+    this.initEvent()
+    return new Promise((resolve, reject) => {
       this.mapInitExtent = this.map
         .getView()
         .calculateExtent(this.map.getSize())
-      callback && callback(map)
-    }, 500)
-    // map event
-    this.initEvent()
+      resolve({ map })
+    })
   }
 
   /**
@@ -431,13 +427,13 @@ class VMap extends Base {
    * @param {*} options 图层信息 {id,visible,type = V_MAP_PROVIDER}
    * @param {*} prj 坐标系
    */
-  addLayerByType(options, prj = getConfig().prj) {
+  addLayerByType(options, prj = this.mapConfig.prj) {
     let { id, visible, once, type } = options
     if (!type) {
       return
     }
     if (!id) {
-      id = uuid()
+      id = VcUtils.uuid() // uuid()
       options['id'] = id
     }
     if (once) {
@@ -455,7 +451,7 @@ class VMap extends Base {
   }
 
   getBaseLayer(group) {
-    const { prj } = getConfig()
+    const { prj } = this.mapConfig
     let layers = []
     let imageLayer = null
     this.resetBaseLayer()
@@ -502,9 +498,9 @@ class VMap extends Base {
    * @param {*} prj EPSG:4326 | EPSG:3857
    * @returns
    */
-  getLayerByType(options, prj = getConfig().prj) {
+  getLayerByType(options, prj = this.mapConfig.prj) {
     this.parseLayerOptions(options)
-    console.log('layeroptions...........', options)
+    // console.log('layeroptions...........', options)
     switch (options.type) {
       case V_MAP_PROVIDER.wmts:
         return this.layerHandler.getWmtsByPrj({
@@ -580,19 +576,19 @@ class VMap extends Base {
 
   addSuperMapLayer(options) {
     this.map.addLayer(
-      this.layerHandler.getSuperMapWmts({ options, prj: getConfig().prj })
+      this.layerHandler.getSuperMapWmts({ options, prj: this.mapConfig.prj })
     )
   }
 
   addSuperMapXYZ(options) {
     this.map.addLayer(
-      this.layerHandler.getSuperMapXYZ({ options, prj: getConfig().prj })
+      this.layerHandler.getSuperMapXYZ({ options, prj: this.mapConfig.prj })
     )
   }
 
   addTdtLayer(options) {
     this.map.addLayer(
-      this.layerHandler.getTdtByPrj({ options, prj: getConfig().prj })
+      this.layerHandler.getTdtByPrj({ options, prj: this.mapConfig.prj })
     )
   }
 
@@ -606,7 +602,7 @@ class VMap extends Base {
    */
   addGeoserverWmts(options) {
     this.map.addLayer(
-      this.layerHandler.getWmtsGeoserver({ options, prj: getConfig().prj })
+      this.layerHandler.getWmtsGeoserver({ options, prj: this.mapConfig.prj })
     )
   }
 
@@ -738,6 +734,7 @@ class VMap extends Base {
   getLayerHandler(map = this.map) {
     if (this.layerHandler == null) {
       this.layerHandler = new LayerHandler(map)
+      this.layerHandler.prj = this.mapConfig.prj
     }
     return this.layerHandler
   }
@@ -783,7 +780,9 @@ class VMap extends Base {
   }
 
   newDrawConditions() {
-    return new DrawConditions()
+    const d = new DrawConditions()
+    d.projection = this.mapConfig.prj
+    return d
   }
 
   /**
@@ -793,6 +792,7 @@ class VMap extends Base {
   getDrawCondtions() {
     if (this.drawConditions == null) {
       this.drawConditions = new DrawConditions()
+      this.drawConditions.projection = this.mapConfig.prj
     }
     return this.drawConditions
   }

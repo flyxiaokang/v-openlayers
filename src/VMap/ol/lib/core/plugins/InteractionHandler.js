@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-04-19 13:54:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-16 18:26:52
+ * @LastEditTime: 2024-07-23 17:32:02
  */
 
 import { Draw, Modify, Snap, Select } from 'ol/interaction'

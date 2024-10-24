@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-10-20 10:04:21
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-09-14 10:36:07
+ * @LastEditTime: 2024-07-23 21:01:02
  */
 
 import Draw from 'ol/interaction/Draw'
@@ -17,9 +17,7 @@ import { getArea, getLength } from 'ol/sphere'
 import { unByKey } from 'ol/Observable'
 import MultiPoint from 'ol/geom/MultiPoint'
 import Feature from 'ol/Feature'
-import {getConfig} from '@/VMap/ol/config'
 
-let mapConfig = {}
 // global so we can remove it later
 let pointerMoveHandler
 let draw
@@ -74,7 +72,6 @@ function clear(map) {
 }
 
 function init(map, measureType) {
-  mapConfig = getConfig()
   curMeasureType = measureType
 
   const source = new VectorSource()
@@ -150,7 +147,7 @@ function init(map, measureType) {
    */
   const formatLength = function(line) {
     const length = getLength(line, {
-      projection: mapConfig.prj
+      projection: map.getView().getProjection().getCode()
     })
     let output
     if (length > 100) {
@@ -168,7 +165,7 @@ function init(map, measureType) {
    */
   const formatArea = function(polygon) {
     const area = getArea(polygon, {
-      projection: mapConfig.prj
+      projection: map.getView().getProjection().getCode()
     })
     let output
     if (area > 10000) {
@@ -443,7 +440,6 @@ export default class MeasureHandler extends Base{
   }
 
   measureLength(map = this.map, clearLast = false) {
-    debugger
     map.set('mouseStatus',V_MOUSE_STATUS.mesure)
     clearLast && clear(map)
     init(map, 'length')

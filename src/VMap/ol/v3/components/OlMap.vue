@@ -4,14 +4,15 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-20 14:57:22
+ * @LastEditTime: 2024-10-24 17:27:56
 -->
 <template>
   <div class="vmap-container">
     <!-- map -->
     <div :id="target" class="vmap-view" />
     <slot name="popup"></slot>
-    <slot></slot>
+    <slot v-if="mapReady"></slot>
+
     <!-- 地图状态条 -->
     <MapStatus
       v-if="showStatusbar"
@@ -19,8 +20,19 @@
       :position="position"
       :zoom="curZoom"
     />
+
+    <!-- identify -->
+    <OlIdentify
+      v-if="useElementPlus"
+      title="属性"
+      :theme="theme"
+      :position="curPosition"
+      :features="identifyList"
+      :identify-config="identifyConfig"
+    >
+    </OlIdentify>
     <!-- popup -->
-    <MapPopup
+    <!-- <MapPopup
       v-show="showFeaturePopupLocal"
       :popupId="popupId"
       :title="featurePopupTitle"
@@ -32,9 +44,9 @@
         :table-header="singlePopupTableHeader"
         :table-data="featureTableData"
       />
-    </MapPopup>
+    </MapPopup> -->
     <!-- multiple popup -->
-    <div v-show="showMultiplePopupLocal" :id="popupsId">
+    <!-- <div v-show="showMultiplePopupLocal" :id="popupsId">
       <MapPopup
         v-for="(item, index) in computePopups"
         :popupId="item.id"
@@ -47,109 +59,25 @@
           :table-data="item.attributes"
         />
       </MapPopup>
-    </div>
-    <!-- identify -->
-    <!-- <MapPopup
-      v-show="showIdentify"
-      :popupId="popupId + '_identify_'"
-      title="属性"
-      @on-close="handleClosePopup"
-    >
-      <el-tabs
-        v-model="activeIdentify"
-        class="demo-tabs"
-        @tab-click="handleClick"
-      >
-        <el-tab-pane
-          v-for="(item, index) in identifyList"
-          :label="item.name"
-          :name="item.name"
-          :key="index"
-        >
-          <TableWidget
-            :style="{ height: singlePopupTableHeight + 'px' }"
-            :table-header="singlePopupTableHeader"
-            :table-data="item.attributes"
-          />
-        </el-tab-pane>
-      </el-tabs>
-    </MapPopup> -->
-
-    <!-- identify -->
-    <OlIdentify
-      title="属性"
-      :theme="identifyConfig.theme"
-      :position="curPosition"
-    >
-      <el-tabs
-        v-model="activeIdentify"
-        style="max-width: 200px"
-        @tab-click="handleClick"
-      >
-        <el-tab-pane
-          v-for="(item, index) in identifyList"
-          :label="item.name"
-          :name="item.name"
-          :key="index"
-        >
-          <TableWidget
-            :style="{ height: identifyConfig.height + 'px' }"
-            :table-header="identifyConfig.header"
-            :show-header="identifyConfig.showHeader"
-            :table-data="item.attributes"
-          />
-        </el-tab-pane>
-      </el-tabs>
-    </OlIdentify>
-
-    <!-- 绘制 -->
-    <!-- <MapDraw
-      v-if="showMapDraw"
-      class="vmap-drawer"
-      @draw-change="handleDrawChange"
-      @close="handleCloseDraw"
-    /> -->
-    <!-- 图层管理 -->
-    <!-- <transition name="el-zoom-in-top">
-      <Draggable
-        v-if="layerManagerVisible"
-        title="图层列表"
-        :initTop="0"
-        :init-right="100"
-        :initWidth="200"
-        :initHeight="400"
-        @closeDraggable="handleCloseTool"
-      >
-        <MapLayerManager
-          :default-checked="defaultCheckLayerIds"
-          @on-checkchange="handleCheckChange"
-        />
-      </Draggable>
-    </transition> -->
+    </div> -->
   </div>
 </template>
 
 <script setup>
 import { ref, toRefs, onMounted, computed, watch, reactive, provide } from 'vue'
-import { getOlHandler } from '@/VMap/ol/init'
+import { getOlHandler, OlHandler } from '@/VMap/ol/init'
 import { setConfig, getConfig } from '@/VMap/ol/config'
-import VUtils from '@/VMap/public/utils/base'
-
-import OlIdentify from '@/VMap/ol/v3/components/layer/popup/Identify.vue'
-
-import MapPopup from './popup/index.vue'
-// import MapLayerManager from '@/VMap/public/components/Map/MapLayerManager.vue'
-import MapStatus from '@/VMap/public/components/Map/MapStatus.vue'
-import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
-
-import TableWidget from '@/VMap/components/Table/index.vue'
-//import Draggable from '@/VMap/components/Draggable/index.vue'
-import { V_MOUSE_STATUS } from '@/VMap/global'
-import { V_THEME } from '@/VMap/global'
+import VUtils from '@/VMap/public/utils/base/index'
+import { V_MOUSE_STATUS, V_THEME } from '@/VMap/global'
 import { useEmits } from '@/VMap/public/use/useEvent'
 
-const olInstance = getOlHandler()
+import OlIdentify from '@/VMap/ol/v3/components/layer/popup/identify/index.vue'
+import MapPopup from './popup/index.vue'
+import MapStatus from '@/VMap/public/components/Map/status/index.vue'
+import TableWidget from '@/VMap/components/Table/index.vue'
+import { deepClone } from '@/VMap/public/utils/base/common'
 
+const olInstance = getOlHandler()
 const curMapCenter = ref([])
 
 provide('olHandler', olInstance)
@@ -246,7 +174,7 @@ const props = defineProps({
     type: Object,
     default() {
       return {
-        height: 200,
+        height: 220,
         header: [
           {
             label: '属性',
@@ -283,6 +211,10 @@ const props = defineProps({
       }
     },
   },
+  useElementPlus: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const {
@@ -296,12 +228,16 @@ const {
   showMultiplePopup,
   identify,
   dragPan,
+  useElementPlus,
 } = toRefs(props)
 
 const emits = defineEmits(useEmits)
 
-const target = `${VUtils.uuidOnlyStr()}-vmap-id`
-let mapReady = false
+// const _mapConfig = deepClone(mapConfig.value)
+provide('mapConfig', mapConfig.value)
+
+const target = ref(`${VUtils.uuidOnlyStr()}-vmap-id`)
+let mapReady = ref(false)
 // 实时坐标
 let position = ref([0, 0])
 
@@ -360,7 +296,7 @@ watch(
 
 const checkFeaturePopup = (nv) => {
   if (
-    mapReady &&
+    mapReady.value &&
     showFeaturePopup.value &&
     JSON.stringify(nv) != '{}' &&
     nv.hasOwnProperty('location') &&
@@ -371,7 +307,7 @@ const checkFeaturePopup = (nv) => {
 }
 
 const checkMultiplePopup = (nv) => {
-  if (mapReady && showMultiplePopup.value && nv instanceof Array) {
+  if (mapReady.value && showMultiplePopup.value && nv instanceof Array) {
     return true
   } else return false
 }
@@ -380,26 +316,24 @@ const handleClick = () => {}
 
 const defaultCheckLayerIds = ref([])
 let showMapDraw = ref(true)
-setConfig(mapConfig.value)
+// setConfig(mapConfig.value)
 
 const curZoom = ref(0)
 onMounted(() => {
-  olInstance.target = target
-  olInstance.initMap(
-    (map) => {
-      mapReady = true
+  olInstance.target = target.value
+  olInstance
+    .initMap(mapConfig.value, {
+      controls: controls.value,
+      showBasemap: showBasemap.value,
+      dragPan: dragPan.value,
+    })
+    .then(({ map }) => {
+      mapReady.value = true
       map.set('mouseStatus', V_MOUSE_STATUS.none)
       emits('ready', olInstance)
       curZoom.value = map.getView().getZoom()
       bindEvent()
-    },
-    {
-      controls: controls.value,
-      showBasemap: showBasemap.value,
-      dragPan: dragPan.value,
-      view: mapConfig.value.defaultView,
-    }
-  )
+    })
 })
 
 // 事件
@@ -410,7 +344,10 @@ const bindEvent = () => {
   })
 
   olInstance.registerMouseClick((e) => {
-    if (identify.value && !showFeaturePopup.value) {
+    console.log('click===', e, e.map.get('mouseStatus'))
+    const mouseStatus = e.map.get('mouseStatus')
+    if (mouseStatus === V_MOUSE_STATUS.draw) return
+    if (e.map.get('mouseStatus') === 'none' && identify.value) {
       handleIdentify(e)
     }
     emits('mouse-click', e)
@@ -432,6 +369,7 @@ const curPosition = ref([])
 const handleIdentify = (e) => {
   let features = olInstance.map.getFeaturesAtPixel(e.pixel) || []
   const coordinate = e.coordinate
+  console.log('fs...', features)
   if (features.length === 0) {
     return
   }
@@ -711,12 +649,16 @@ export default {
   border: 2px dashed red;
 }
 
+:deep(.ol-scale-line) {
+  border-radius: 2px;
+}
+
 :deep(.ol-scale-line.ol-unselectable) {
   // left: calc(100% - 120px);
   left: 10px;
-  padding: 4px;
+  padding: 1px 3px;
   bottom: 0px;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(255 255 255 / 61%);
   // width: 100px;
 }
 

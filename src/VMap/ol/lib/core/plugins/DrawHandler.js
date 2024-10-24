@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-02-11 17:36:50
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-19 16:44:00
+ * @LastEditTime: 2024-10-02 11:43:25
  */
 import { Draw, Modify, Snap, Select } from 'ol/interaction'
 import { Vector as VectorSource } from 'ol/source'
@@ -253,6 +253,7 @@ class DrawHandler extends Base {
 
     let lastClick = ''
     draw.on('drawend', (e) => {
+      console.log('end===',e)
       e.stopPropagation()
       e['dbClick'] = false
       const feature = e.feature
@@ -275,6 +276,7 @@ class DrawHandler extends Base {
         if (onceOnly) {
           this.removeInteraction(map)
           this.addModify(map, selectEnable, modifyEnable)
+          map.set('mouseStatus', V_MOUSE_STATUS.none)
         } else {
           this.addModify(map, false)
         }
@@ -289,7 +291,9 @@ class DrawHandler extends Base {
           wkt: new WktHandler().feature2wkt(feature),
         })
       // 结束
-      map.set('mouseStatus', V_MOUSE_STATUS.none)
+      // setTimeout(() => {
+      //   map.set('mouseStatus', V_MOUSE_STATUS.none)
+      // }, 1000);
       this.remenberDrawCoordinates = []
       this.step = 0
       this.curFeature = null
@@ -368,6 +372,7 @@ class DrawHandler extends Base {
   endDraw(map = this.map) {
     this.removeInteraction(map)
     this.endSpliceLine()
+    map.set('mouseStatus', V_MOUSE_STATUS.none)
   }
 
   endInteraction(map = this.map) {

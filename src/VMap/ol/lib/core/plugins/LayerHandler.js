@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:23:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-22 14:53:12
+ * @LastEditTime: 2024-07-24 14:45:52
  */
 
 // import 'ol/ol.css'
@@ -56,7 +56,7 @@ import { Circle } from 'ol/geom'
 import { get as getProjection } from 'ol/proj'
 import { getTopLeft, getWidth } from 'ol/extent'
 
-import Projection from 'ol/proj/projection'
+import Projection from 'ol/proj/Projection'
 
 import GeoJSON from 'ol/format/GeoJSON'
 
@@ -100,6 +100,9 @@ function getLayerParams({ id, visible, opacity, zIndex, minZoom, maxZoom }) {
 // ).href
 
 export default class LayerHandler {
+  prj = getConfig().prj
+  isWgs84 = false
+  isWebmocat = false
   defaultStyle = new Style({
     fill: new Fill({
       color: 'rgba(255, 208, 75, 0.5)',
@@ -121,11 +124,12 @@ export default class LayerHandler {
   })
   defaultVectorLayerId = 'vector_layer_temp_id_'
 
-  constructor(map) {
+  constructor(map, prj) {
     this.map = map
+    this.prj = prj
   }
 
-  setMap(map) {
+  setMap(map, prj) {
     this.map = map
   }
 
@@ -983,9 +987,9 @@ export default class LayerHandler {
    * @param {*} features
    */
   trasnformPrj(features) {
-    if (!isWgs84) {
+    if (!this.prj.includes('4326')) {
       features.forEach((f) => {
-        f.getGeometry().transform('EPSG:4326', getConfig().prj)
+        f.getGeometry().transform('EPSG:4326', this.prj)
       })
     }
   }

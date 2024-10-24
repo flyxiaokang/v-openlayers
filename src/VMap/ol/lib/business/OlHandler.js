@@ -4,24 +4,16 @@
  * @Author: kangjinrui
  * @Date: 2021-12-27 15:13:32
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-28 14:21:13
+ * @LastEditTime: 2024-07-23 17:11:57
  */
 
 import ImageLayer from 'ol/layer/Image'
 import ImageCanvasSource from 'ol/source/ImageCanvas'
 import { Vector as VectorSource } from 'ol/source'
 import { Vector as VectorLayer } from 'ol/layer'
-import {
-  Style,
-  Fill,
-  Stroke,
-  Circle as CircleStyle,
-  Text,
-  Icon,
-} from 'ol/style'
 
 import Feature from 'ol/Feature'
-import VcUtils from '@/VMap/public/utils/base'
+import VcUtils from '@/VMap/public/utils/base/index'
 import { getStyle } from '../core/plugins/StyleHandler'
 import VMap from '../core/VMap'
 
@@ -29,27 +21,6 @@ export default class OlHandler extends VMap {
   name = 'OlHandler class'
   // 地图容器
   target = ''
-  // defaultPolygonStyle = new Style({
-  //   fill: new Fill({
-  //     color: 'rgba(255, 208, 75, 0.5)',
-  //   }),
-  // })
-
-  // defaultLineStyle = new Style({
-  //   stroke: new Stroke({
-  //     color: 'red',
-  //     width: 2,
-  //   }),
-  // })
-
-  // defaultPointStyle = new Style({
-  //   image: new CircleStyle({
-  //     radius: 7,
-  //     fill: new Fill({
-  //       color: '#ffcc33',
-  //     }),
-  //   }),
-  // })
   constructor(target = 'ol-map-container') {
     super(target)
     // 图层集合

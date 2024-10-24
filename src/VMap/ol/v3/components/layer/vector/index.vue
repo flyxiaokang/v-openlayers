@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:03:20
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-03-21 18:01:03
+ * @LastEditTime: 2024-07-25 17:10:25
 -->
 <template></template>
 <script setup>
@@ -22,9 +22,10 @@ import {
 import { useProps, useEmits, useWatch } from '../baseLayer'
 import InteractionHandler from '@/VMap/ol/lib/core/plugins/InteractionHandler'
 import { uuid } from '@/VMap/public/utils/base/string'
-import { OlHandler } from '@/entry/ol.entry'
+// import { OlHandler} from '@/VMap/ol/init'
 
-let olHandler = new OlHandler()
+let olHandler = null
+// olHandler = new OlHandler()
 olHandler = inject('olHandler')
 
 const props = defineProps({
@@ -121,6 +122,7 @@ watch(modifiable, () => {
 })
 
 const initLayer = () => {
+  // console.log('olinstance.......................',olHandler.toString())
   if (isValidLayerId()) {
     if (clusterOptions.value) {
       olHandler.removeLayerById(getLayerId.value)

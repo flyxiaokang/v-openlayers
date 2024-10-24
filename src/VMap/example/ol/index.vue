@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-19 16:13:41
+ * @LastEditTime: 2024-09-30 17:25:51
 -->
 <template>
   <div id="app-container">
@@ -13,11 +13,13 @@
       class="demo-tabs"
       style="margin: 0 10px; height: 100%"
     >
-      <el-tab-pane label="4326-map" name="s" lazy>
-        <LayerWgs84 style="height: 70vh"></LayerWgs84>
-      </el-tab-pane>
-      <el-tab-pane label="3857-map" name="first">
-        <LayerWebmocat style="height: 70vh"></LayerWebmocat>
+      <el-tab-pane label="map" name="first">
+        <div style="display: flex;">
+          <LayerWgs84 style="height: 70vh;"></LayerWgs84>
+          <!-- <LayerWgs84 style="height: 70vh;"></LayerWgs84>
+          <LayerWebmocat style="height: 70vh;"></LayerWebmocat> -->
+          <LayerWebmocat style="height: 70vh;"></LayerWebmocat>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -94,7 +96,7 @@ const activeName = ref('first')
 }
 
 :deep(.el-tabs__content) {
-  height: calc(100% - 60px);
+  /* height: calc(100% - 60px); */
 }
 </style>
 

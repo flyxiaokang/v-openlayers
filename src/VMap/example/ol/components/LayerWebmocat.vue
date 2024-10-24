@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-22 20:15:17
+ * @LastEditTime: 2024-10-18 18:02:34
 -->
 <template>
   <div style="width: 100%; height: 100%">
@@ -35,6 +35,7 @@
     <OlMap
       style="height: calc(100% - 100px)"
       theme="light"
+      identify
       :map-config="mapConfig"
       @ready="handleMapReady"
       @mouse-click="handleMouseClick"
@@ -57,7 +58,9 @@
       </OlOverlay>
 
       <!-- popup -->
-      <OlPopup title="属性" :position="curPosition"> </OlPopup>
+      <OlPopup title="属性" :position="curPosition">
+      test  
+      </OlPopup>
 
       <!-- <OlPopup
         title="属性"
@@ -201,46 +204,44 @@
         :opacity="opacity"
       /> -->
 
-      <!-- <MapDrawer
+      <!-- <OlDrawer
         class="vmap-drawer"
         :snap-enable="true"
         :once-only="true"
-      ></MapDrawer> -->
+      ></OlDrawer> -->
       <!-- <OlEagle
-        class="vmap-eagle"
-        :init-zoom="5"
-        :init-width="300"
-        :init-height="300"
-        :init-center="[116.5, 40]"
       ></OlEagle> -->
 
-      <!-- <MapDrawer
+      <!-- <OlDrawer
         class="vmap-drawer"
         :snap-enable="true"
         :once-only="true"
         @draw-end="handleDrawend"
-      ></MapDrawer> -->
+      ></OlDrawer> -->
     </OlMap>
   </div>
 </template>
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import OlMap from '@/VMap/ol/v3/components/OlMap.vue'
-import OlBasemap from '@/VMap/ol/v3/components/toolbar/MapBaseLayer.vue'
-import OlToolbar from '@/VMap/ol/v3/components/toolbar/MapBar.vue'
-import OlPopup from '@/VMap/ol/v3/components/layer/popup/index.vue'
 
-import OlOverlay from '@/VMap/ol/v3/components/layer/overlay/index.vue'
-import OlVector from '@/VMap/ol/v3/components/layer/vector/index.vue'
-import OlTile from '@/VMap/ol/v3/components/layer/tile/index.vue'
-import OlTdt from '@/VMap/ol/v3/components/layer/tdt/index.vue'
-import OlSupermap from '@/VMap/ol/v3/components/layer/supermap/index.vue'
-import OlWms from '@/VMap/ol/v3/components/layer/wms/index.vue'
-import OlArcgis from '@/VMap/ol/v3/components/layer/arcgis/index.vue'
-import OlVectortile from '@/VMap/ol/v3/components/layer/vectorTile/index.vue'
-
-import OlEagle from '@/VMap/ol/v3/components/eagle/index.vue'
-import MapDrawer from '@/VMap/ol/v3/components/toolbar/MapDrawer.vue'
+// com
+import {
+  OlMap,
+  OlBasemap,
+  OlToolbar,
+  OlDrawer,
+  OlEagle,
+  OlPopup,
+  OlOverlay,
+  OlVector,
+  OlTile,
+  OlTdt,
+  OlSupermap,
+  OlArcgis,
+  OlWms,
+  OlVectortile,
+  VueDraggable,
+} from '@/VMap/ol/v3/components/index'
 
 import PointsJson from '../../data/wkt/points.json'
 import MultLinesJson from '../../data/wkt/multlines.json'
@@ -251,9 +252,9 @@ import PolygonGeojson from '../../data/geojson/polygon.json'
 import PolylineGeojson from '../../data/geojson/polyline.json'
 import PointGeojson from '../../data/geojson/point.json'
 
-import { getOlHandler } from '@/VMap/ol/init'
-import VUtils from '@/VMap/public/utils/base'
-import mapConfig from '../mapConfig'
+import VUtils from '@/VMap/public/utils/base/index'
+import { OlHandler} from '@/VMap/ol/init'
+import mapConfig from '../config/mapConfig'
 
 const opacity = ref(1)
 
@@ -376,10 +377,10 @@ const polygonStyle = ref({
   },
 })
 
-const visibleValue = ref(false)
+const visibleValue = ref(true)
 const modifyableValue = ref(false)
 const handleSelectChange = () => {}
-const PolygonJson = ref(MultPolygonsJson)
+const PolygonJson = ref(VUtils.deepClone(MultPolygonsJson))
 const handleChangePolygon = () => {
   PolygonJson.value.forEach((p) => {
     p['style'] = {

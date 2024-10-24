@@ -15,3 +15,6 @@ import OlHandler from './lib/business/OlHandler'
 export function getOlHandler(domid) {
     return new OlHandler(domid)
 }
+
+export { default as OlHandler } from './lib/business/OlHandler'
+

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:11:12
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-01-18 09:41:09
+ * @LastEditTime: 2024-10-01 15:22:03
 -->
 <template>
   <div v-show="false" :id="popupId" :class="getClass">
@@ -146,13 +146,15 @@ export default {
 <style lang="scss" scoped>
 .vmap-ol-popup {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0) !important;
+  // background-color: rgba(255, 255, 255, 0) !important;
+  background-color: #00000080;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  border: 1px solid #cccccc;
+  // border: 1px solid #cccccc;
   bottom: 12px;
   left: -50px;
   min-width: 99px !important;
   border-radius: 8px;
+  padding: 5px 0;
 }
 
 .vmap-title {
@@ -224,13 +226,13 @@ export default {
 }
 
 .dark .vmap-popup-content {
-  background-color: rgba(0, 0, 0, 0.5);
+  // background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
 
 .vmap-popup-content {
   width: 100%;
-  padding: 5px;
+  // padding: 3px;
   text-align: center;
   border-radius: 5px;
   // max-height: 300px;

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:47:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-19 16:41:18
+ * @LastEditTime: 2024-07-24 11:16:08
 -->
 <template></template>
 
@@ -16,7 +16,7 @@ import { nextTick, onMounted, onUnmounted, inject, toRefs } from 'vue'
 import { V_MAP_PROVIDER, getTdtUrl } from '@/VMap/global.js'
 import { getConfig } from '@/VMap/ol/config'
 import { isString } from '@/VMap/public/utils/base/validate'
-import { OlHandler } from '@/entry/ol.entry'
+import { OlHandler} from '@/VMap/ol/init'
 
 let olHandler = new OlHandler()
 olHandler = inject('olHandler')
@@ -146,7 +146,7 @@ const getUrl = computed(() => {
     if (isTdt.value) {
       return getTdtUrl({
         mapStyle: mapProvider.value + '_' + mapStyle.value,
-        prj: getConfig().prj.split(':')[1],
+        prj: olHandler.map.getView().getProjection().getCode().split(':')[1],
         token: token.value,
       })
     }

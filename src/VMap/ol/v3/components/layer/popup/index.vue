@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-09-04 20:56:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-07 15:14:08
+ * @LastEditTime: 2024-10-01 15:13:59
 -->
 <template>
   <MapPopup
@@ -21,8 +21,9 @@
   </MapPopup>
 </template>
 <script setup>
-import { ref, toRefs, watch, inject, onUnmounted } from 'vue'
-import MapPopup from '../../popup/index.vue'
+import { ref, toRefs, watch, inject, onMounted, onUnmounted } from 'vue'
+// import MapPopup from '../../layer/popup/index.vue'
+import MapPopup from '@/VMap/ol/v3/components/popup/index.vue'
 import { useProps } from './usePopup'
 import { uuidOnlyStr } from '@/VMap/public/utils/base/string'
 
@@ -52,15 +53,24 @@ const { showTitle, position } = toRefs(props)
 watch(
   position,
   (nv) => {
-    if (overlay === null) {
-      openFeaturePopup(nv)
-    }
-    overlay.setPosition(nv)
+    init(nv)
   },
   {
     deep: true,
   }
 )
+
+onMounted(() => {
+  console.log('popup mounted........')
+  init(position.value)
+})
+
+const init = (position) => {
+  if (overlay === null) {
+    openFeaturePopup(position)
+  }
+  overlay.setPosition(position)
+}
 
 let overlay = null
 const openFeaturePopup = (position, properties = []) => {
@@ -89,5 +99,11 @@ const handleReset = () => {
 onUnmounted(() => {
   handleReset()
 })
+</script>
+
+<script>
+export default {
+  name: 'OlPopup',
+}
 </script>
 <style lang="scss" scoped></style>
