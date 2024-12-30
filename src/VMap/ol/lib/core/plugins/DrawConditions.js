@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-02 11:10:28
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-09 17:11:32
+ * @LastEditTime: 2024-12-24 11:35:15
  */
 
 import Overlay from 'ol/Overlay'
@@ -21,13 +21,19 @@ export default class DrawConditions {
 
   measureTooltip = null
 
+  drawHandler = null
+
   map = null
-  constructor(options = { showTip: false, maxLength: 100000 }) {
+  constructor(options = { showTip: false, maxDistance: 1000000 }) {
     this.conditions = options
   }
 
-  initialize(options) {
-    this.drawListener(options)
+  initialize({ map, draw }, drawHandler) {
+    this.map = map
+    this.draw = draw
+    this.drawHandler = drawHandler
+    this.projection = map.getView().getProjection().getCode()
+    // this.drawListener(options)
   }
 
   registerEvent(eventName, callback) {
@@ -36,12 +42,11 @@ export default class DrawConditions {
     }
   }
 
-  drawListener({ map, draw }) {
-    this.map = map
+  drawListener({ sketch, tooltipCoord }) {
     const _this = this
-    const { projection } = this
-    const { showTip, maxLength } = this.conditions
-
+    const { map, draw ,projection} = this
+    // console.log('conditions=====', this.conditions)
+    const { showTip, maxDistance, excludeGeometries = [] } = this.conditions
     let measureTooltipElement
 
     if (showTip) {
@@ -63,17 +68,20 @@ export default class DrawConditions {
       })
       map.addOverlay(_this.measureTooltip)
     }
-
+    // console.log('epsg===',projection)
     const formatLength = function (line) {
       const length = getLength(line, {
         projection,
       })
       let output
-      if (length > 100) {
+      if (length > 1000) {
         output = Math.round((length / 1000) * 100) / 100 + ' ' + 'km'
       } else {
         output = Math.round(length * 100) / 100 + ' ' + 'm'
       }
+      // if(length > maxDistance){
+      //   return maxDistance
+      // }
       return output
     }
 
@@ -86,52 +94,43 @@ export default class DrawConditions {
       }
     }
 
-    draw.on('drawstart', (evt) => {
-      // set sketch
-      const sketch = evt.feature
+    let lastCoord = []
+    let flag = false
 
-      let tooltipCoord = []
-      if (sketch.getGeometry().getType() === 'LineString') {
-        tooltipCoord = evt.coordinate || sketch.getGeometry().getCoordinateAt(1)
-      } else {
+    this.listener = sketch.getGeometry().on('change', function (evt) {
+      // console.log('change=======', evt)
+      const geom = evt.target
+      let output
+      let distance = 0
+
+      if (geom.getType() === '') {
+        output = formatArea(geom)
+        tooltipCoord = geom.getInteriorPoint().getCoordinates()
+      } else if (geom.getType() === 'LineString') {
+        output = formatLength(geom)
+        tooltipCoord = geom.getLastCoordinate()
+        const coords = geom.getCoordinates()
+        const sp = coords[coords.length - 2]
+        distance = parseInt(formatDistance(sp, tooltipCoord))
+        if (distance === 0 && flag) {
+          flag = false
+          draw.removeLastPoint()
+        } else if (distance > 0 && distance <= maxDistance) {
+          lastCoord = [...tooltipCoord]
+          flag = false
+          _this.geometryChangeEvent && _this.geometryChangeEvent(sketch, geom)
+        } else if (distance > maxDistance) {
+          coords.pop()
+          coords.push(lastCoord)
+          geom.setCoordinates(coords)
+          flag = true
+        }
       }
-
-      let lastCoord = []
-      let flag = false
-      this.listener = sketch.getGeometry().on('change', function (evt) {
-        const geom = evt.target
-        let output
-        let distance = 0
-
-        if (geom.getType() === '') {
-          output = formatArea(geom)
-          tooltipCoord = geom.getInteriorPoint().getCoordinates()
-        } else if (geom.getType() === 'LineString') {
-          output = formatLength(geom)
-          tooltipCoord = geom.getLastCoordinate()
-          const coords = geom.getCoordinates()
-          const sp = coords[coords.length - 2]
-          distance = parseInt(formatDistance(sp, tooltipCoord))
-          if (distance === 0 && flag) {
-            flag = false
-            draw.removeLastPoint()
-          } else if (distance > 0 && distance <= maxLength) {
-            lastCoord = [...tooltipCoord]
-            flag = false
-            _this.geometryChangeEvent && _this.geometryChangeEvent(sketch, geom)
-          } else if (distance > maxLength) {
-            coords.pop()
-            coords.push(lastCoord)
-            geom.setCoordinates(coords)
-            flag = true
-          }
-        }
-        // console.log('change...', output, tooltipCoord, distance, flag);
-        if (showTip) {
-          measureTooltipElement.innerHTML = output
-          _this.measureTooltip.setPosition(tooltipCoord)
-        }
-      })
+      // console.log('change...', output, tooltipCoord, distance, flag);
+      if (showTip) {
+        measureTooltipElement.innerHTML = output
+        _this.measureTooltip.setPosition(tooltipCoord)
+      }
     })
   }
 

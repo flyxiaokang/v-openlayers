@@ -1,10 +1,10 @@
 /*
- * @Description:
+ * @Description: wms
  * @Version:
  * @Author: kangjinrui
  * @Date: 2023-04-07 15:51:23
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-04-23 15:28:58
+ * @LastEditTime: 2024-12-25 18:07:00
  */
 
 class WmsHandler {
@@ -27,7 +27,34 @@ class WmsHandler {
       ...options,
       QUERY_LAYERS: layers,
     }
-    const url = source.getGetFeatureInfoUrl(
+    const url = source.getFeatureInfoUrl(
+      coordinate,
+      viewResolution,
+      projection,
+      params
+    )
+    return fetch(url).then((res) => res.json())
+  }
+
+  /**
+   * 点查询
+   * @param {*} param0 {wmslayer,coordinate,projection,options}
+   * @returns geojson
+   */
+  requestFeatureByPoint({
+    layer,
+    coordinate,
+    projection = 'EPSG:4326',
+    options = { INFO_FORMAT: 'application/json' },
+  }) {
+    const source = layer.getSource()
+    const { layers } = source.getParams()
+    const viewResolution = this.map.getView().getResolution()
+    const params = {
+      ...options,
+      QUERY_LAYERS: layers,
+    }
+    const url = source.getFeatureInfoUrl(
       coordinate,
       viewResolution,
       projection,

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-02-11 17:36:50
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-10-02 11:43:25
+ * @LastEditTime: 2024-12-27 14:43:07
  */
 import { Draw, Modify, Snap, Select } from 'ol/interaction'
 import { Vector as VectorSource } from 'ol/source'
@@ -27,6 +27,11 @@ const DRAW_TYPE_ENUM = {
   Circle: 'Circle',
   Box: 'Box',
   Ring: 'Ring',
+}
+
+
+const DRAW_ERROR_CODE = {
+  exclude_point: 1, //不相交
 }
 
 import WktHandler from './WktHandler'
@@ -58,6 +63,7 @@ class DrawHandler extends Base {
     this.layerHandler = new LayerHandler(map)
 
     this.layerId = 'layerId_draw'
+    this.zIndex = 1999
     this.imageStyle = { radius: 7 }
 
     this.defaultStyle = new Style({
@@ -89,27 +95,30 @@ class DrawHandler extends Base {
   }
 
   createLayer(style) {
-    const {
-      radius = 5,
-      strokeColor = '#ffcc33',
-      color = 'rgba(255, 204, 51,0.7)',
-      width = 2,
-    } = style
-    this.defaultStyle = new Style({
-      fill: new Fill({
-        color,
-      }),
-      stroke: new Stroke({
-        color: strokeColor,
-        width,
-      }),
-      image: new CircleStyle({
+    if (Object.keys(style).length === 0) {
+    } else {
+      const {
+        radius = 5,
+        strokeColor = '#ffcc33',
+        color = 'rgba(255, 204, 51,0.7)',
+        width = 2,
+      } = style
+      this.defaultStyle = new Style({
         fill: new Fill({
           color,
         }),
-        radius,
-      }),
-    })
+        stroke: new Stroke({
+          color: strokeColor,
+          width,
+        }),
+        image: new CircleStyle({
+          fill: new Fill({
+            color,
+          }),
+          radius,
+        }),
+      })
+    }
 
     this.source = new VectorSource({
       wrapX: false,
@@ -121,6 +130,7 @@ class DrawHandler extends Base {
       style: this.defaultStyle,
     })
 
+    this.vector.setZIndex(this.zIndex)
     return this.vector
   }
 
@@ -192,7 +202,9 @@ class DrawHandler extends Base {
       modifyEnable = false,
       selectEnable = false,
       onceOnly = false,
+      clear = false,
       freehand = false,
+      drawStartHandle = null,
       drawEndHandle = null,
       style = {},
       conditions = {},
@@ -201,6 +213,8 @@ class DrawHandler extends Base {
       snapEnable: false,
       modifyEnable: false,
       onceOnly: false,
+      clear: false,
+      drawStartHandle: null,
       drawEndHandle: null,
       conditions: {},
       style: {},
@@ -252,8 +266,46 @@ class DrawHandler extends Base {
     map.addInteraction(draw)
 
     let lastClick = ''
+    this.initConditions(conditions)
+    const { intersectGeometries = [] } = conditions
+    draw.on('drawstart', (evt) => {
+      // console.log('start=======', evt)
+      const sketch = evt.feature
+      let tooltipCoord = []
+      const sketchType = sketch.getGeometry().getType()
+      if (sketchType === 'LineString') {
+        tooltipCoord = evt.coordinate || sketch.getGeometry().getCoordinateAt(1)
+      } else if (sketchType === 'Point') {
+        tooltipCoord = sketch.getGeometry().getCoordinates()
+      }
+      let bIntersect = false
+      if (intersectGeometries.length > 0) {
+        intersectGeometries.forEach((geo) => {
+          bIntersect = geo.intersectsCoordinate(tooltipCoord)
+        })
+        if (!bIntersect) {
+          if (sketchType === 'LineString') {
+            draw.removeLastPoint()
+          } else if (sketchType === 'Point') {
+            evt.feature.getGeometry().setCoordinates([])
+          }
+        } else {
+        }
+      }
+      this.drawConditions.drawListener({ sketch, tooltipCoord })
+      drawStartHandle &&
+        drawStartHandle({
+          e: evt,
+          code: bIntersect ? 0 : DRAW_ERROR_CODE.exclude_point,
+          intersect: bIntersect,
+        })
+    })
+
     draw.on('drawend', (e) => {
-      console.log('end===',e)
+      // console.log('end=======', e)
+      if (clear) {
+        this.clear()
+      }
       e.stopPropagation()
       e['dbClick'] = false
       const feature = e.feature
@@ -307,9 +359,6 @@ class DrawHandler extends Base {
     // if (modifyEnable) {
     //     this.addModify(map, selectEnable)
     // }
-    if (JSON.stringify(conditions) != '{}') {
-      this.initConditions(conditions)
-    }
   }
 
   createRing(center, innerR = 0, outerR = 0) {
@@ -354,9 +403,12 @@ class DrawHandler extends Base {
 
   initConditions(conditions) {
     const { map, draw } = this
+    if (this.drawConditions) {
+      this.drawConditions.destroy()
+    }
     const drawConditions = new DrawConditions(conditions)
     this.drawConditions = drawConditions
-    drawConditions.initialize({ map, draw })
+    drawConditions.initialize({ map, draw }, this)
 
     drawConditions.registerEvent('on-change', (feature, geom) => {
       this.curFeature = feature
@@ -365,25 +417,66 @@ class DrawHandler extends Base {
     })
   }
 
-  drawPoint(callback, map = this.map) {
-    this.drawByType({ map, drawEndHandle: callback })
+  // drawPoint(callback, map = this.map) {
+  //   this.drawByType({ map, drawEndHandle: callback })
+  // }
+
+  /**
+   * 绘制点
+   * @param {*} callback 绘制完成回调
+   * @param {*} options
+   */
+  drawPoint(drawEndHandle, options = {}) {
+    this.drawByType({
+      ...options,
+      drawEndHandle,
+      type: 'Point',
+    })
   }
 
+  /**
+   * 绘制线
+   * @param {*} callback 绘制完成回调
+   * @param {*} options
+   */
+  drawLineString(drawEndHandle, options = {}) {
+    this.drawByType({ ...options, drawEndHandle, type: 'LineString' })
+  }
+
+  /**
+   * 结束绘制
+   * @param {*} map
+   */
   endDraw(map = this.map) {
     this.removeInteraction(map)
     this.endSpliceLine()
     map.set('mouseStatus', V_MOUSE_STATUS.none)
   }
 
+  /**
+   * 结束交互
+   * @param {*} map
+   */
   endInteraction(map = this.map) {
     this.selectEnable = false
     this.removeInteraction(map)
   }
 
-  clear(map = this.map) {
-    // this.vector?.getSource()?.clear()
+  /**
+   * 删除绘制图层
+   * @param {*} map
+   */
+  remove(map = this.map) {
     this.vector && map.removeLayer(this.vector)
     this.drawConditions && this.drawConditions.destroy()
+  }
+
+  /**
+   * 清空绘制图形
+   * @param {*} map
+   */
+  clear(map = this.map) {
+    this.vector?.getSource().clear()
   }
 
   backward() {

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 09:23:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-24 14:45:52
+ * @LastEditTime: 2024-12-27 14:25:12
  */
 
 // import 'ol/ol.css'
@@ -312,9 +312,9 @@ export default class LayerHandler {
     const { requestParams } = options
 
     const tileGrid = new WMTSTileGrid({
-      origin: requestParams.origin || origin || getTopLeft(projectionExtent),
-      resolutions: requestParams.resolutions || resolutions,
-      matrixIds: requestParams.matrixIds || matrixIds,
+      origin: options.origin || origin || getTopLeft(projectionExtent),
+      resolutions: options.resolutions || resolutions,
+      matrixIds: options.matrixIds || matrixIds,
     })
 
     const layer = new TileLayer({
@@ -387,6 +387,7 @@ export default class LayerHandler {
   }
 
   getWmsTile(options) {
+    // console.log('=================',options)
     return new TileLayer({
       ...getLayerParams(options),
       source: new TileWMS({
@@ -1141,11 +1142,12 @@ export default class LayerHandler {
   }
 
   getMvt({ prj = 'EPSG:3857', options }) {
+    console.log('options========',options)
     let gridsetName = prj
     const projection = getProjection(gridsetName)
     const { resolutions, matrixIds, tileGrid } = V_MAP_GLOBAL[gridsetName]
     const matrixIdsWMTS = this.getMatrixIds(matrixIds, gridsetName)
-    const { id, url: baseUrl, visible, opacity, zIndex } = options
+    const { id, url: baseUrl, visible, opacity, zIndex ,maxZoom,minZoom} = options
     const { style = {} } = options.params
     let format = 'application/vnd.mapbox-vector-tile'
     const params = {
@@ -1187,6 +1189,8 @@ export default class LayerHandler {
       opacity,
       source: constructSource(),
       zIndex,
+      maxZoom,
+      minZoom,
       style: isFunction(style)
         ? style
         : JSON.stringify(style) === '{}'

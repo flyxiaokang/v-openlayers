@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-10-24 17:27:56
+ * @LastEditTime: 2024-12-23 14:12:15
 -->
 <template>
   <div class="vmap-container">
@@ -206,8 +206,6 @@ const props = defineProps({
     type: Object,
     default() {
       return {
-        zoom: true,
-        scaleLine: true,
       }
     },
   },
@@ -331,7 +329,7 @@ onMounted(() => {
       mapReady.value = true
       map.set('mouseStatus', V_MOUSE_STATUS.none)
       emits('ready', olInstance)
-      curZoom.value = map.getView().getZoom()
+      curZoom.value = map.getView().getZoom() - 1
       bindEvent()
     })
 })
@@ -344,7 +342,7 @@ const bindEvent = () => {
   })
 
   olInstance.registerMouseClick((e) => {
-    console.log('click===', e, e.map.get('mouseStatus'))
+    // console.log('click===', e, e.map.get('mouseStatus'))
     const mouseStatus = e.map.get('mouseStatus')
     if (mouseStatus === V_MOUSE_STATUS.draw) return
     if (e.map.get('mouseStatus') === 'none' && identify.value) {

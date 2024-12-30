@@ -41,7 +41,7 @@ const props = defineProps({
     },
   },
 })
-const emits = defineEmits(['on-close'])
+const emits = defineEmits(['on-close', 'on-ready'])
 
 const popupId = 'vmap-popup-id-' + uuidOnlyStr()
 const popupContentHtml = ref('')
@@ -82,6 +82,7 @@ const openFeaturePopup = (position, properties = []) => {
     collection: false,
   })
   showPopup.value = true
+  emits('on-ready', overlay)
 }
 
 const handleClosePopup = () => {

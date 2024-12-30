@@ -96,8 +96,8 @@ onUnmounted(() => {})
 
 .vmap-title {
   width: 100%;
-  height: 30px;
-  line-height: 30px;
+  height: 37px;
+  line-height: 35px;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }

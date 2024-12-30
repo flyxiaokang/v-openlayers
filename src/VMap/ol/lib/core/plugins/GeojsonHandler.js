@@ -1,20 +1,21 @@
 /*
- * @Description: wkt handler
- * @Version:
+ * @Description: 
+ * @Version: 
  * @Author: kangjinrui
- * @Date: 2023-03-03 10:44:56
+ * @Date: 2024-12-20 17:33:37
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-07-20 10:15:38
+ * @LastEditTime: 2024-12-20 17:36:50
  */
+
 import WKT from 'ol/format/WKT'
-import { GeoJSON } from 'ol/format'
+import GeoJSON from 'ol/format/GeoJSON'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style'
 import { uuidOnlyStr } from '@/VMap/public/utils/base/string'
 
-export default class WktHandler extends WKT {
+export default class GeojsonHandler extends GeoJSON {
   defaultStyle = new Style({
     fill: new Fill({
       color: 'rgba(255, 208, 75, 0.5)',
@@ -84,12 +85,4 @@ export default class WktHandler extends WKT {
     const wkt = new WKT().writeFeatures(features)
     return wkt
   }
-
-  wkt2geojson(wkt) {
-    const features = new WKT().readFeatures(geojson)
-    const geojson = new GeoJSON().writeFeatures(features)
-    return geojson
-  }
-
-  geojson2
 }

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:47:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-24 11:16:08
+ * @LastEditTime: 2024-12-27 14:26:04
 -->
 <template></template>
 
@@ -16,7 +16,7 @@ import { nextTick, onMounted, onUnmounted, inject, toRefs } from 'vue'
 import { V_MAP_PROVIDER, getTdtUrl } from '@/VMap/global.js'
 import { getConfig } from '@/VMap/ol/config'
 import { isString } from '@/VMap/public/utils/base/validate'
-import { OlHandler} from '@/VMap/ol/init'
+import { OlHandler } from '@/VMap/ol/init'
 
 let olHandler = new OlHandler()
 olHandler = inject('olHandler')
@@ -60,6 +60,24 @@ const props = defineProps({
     type: Object,
     default() {
       return {}
+    },
+  },
+  origin: {
+    type: [Array, null],
+    default() {
+      return null
+    },
+  },
+  resolutions: {
+    type: [Array, null],
+    default() {
+      return null
+    },
+  },
+  matrixIds: {
+    type: [Array, null],
+    default() {
+      return null
     },
   },
 })

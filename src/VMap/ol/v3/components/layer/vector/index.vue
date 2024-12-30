@@ -4,11 +4,12 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:03:20
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-25 17:10:25
+ * @LastEditTime: 2024-12-23 15:36:17
 -->
 <template></template>
 <script setup>
 import {
+  onBeforeMount,
   onMounted,
   onUnmounted,
   nextTick,
@@ -68,6 +69,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  snapable: {
+    type: Boolean,
+    default: false,
+  },
   clusterOptions: {
     type: [Object, null],
     default() {
@@ -90,13 +95,19 @@ const {
   zIndex,
   selectable,
   modifiable,
+  snapable,
   clusterOptions,
   geomField,
 } = toRefs(props)
 
+onBeforeMount(() => {
+  setLayerId()
+})
+
 onMounted(() => {
   nextTick(() => {
     initLayer()
+    initEvent()
   })
 })
 
@@ -114,22 +125,27 @@ watch(
 )
 
 watch(selectable, () => {
-  handleSelect()
+  layerObject.value && handleSelect()
 })
 
 watch(modifiable, () => {
-  handleModify()
+  layerObject.value && handleModify()
+})
+
+watch(snapable, () => {
+  layerObject.value && handleSnap()
 })
 
 const initLayer = () => {
-  // console.log('olinstance.......................',olHandler.toString())
+  const layerId = getLayerId()
+  // console.log('layerid==========', layerId)
   if (isValidLayerId()) {
     if (clusterOptions.value) {
-      olHandler.removeLayerById(getLayerId.value)
+      olHandler.removeLayerById(layerId)
       layerObject.value = olHandler
         .getLayerHandler()
         .getClusterLayer(features.value, {
-          id: getLayerId.value,
+          id: layerId,
           visible: visible.value,
           style: layerStyle.value,
           zIndex: zIndex.value,
@@ -141,19 +157,31 @@ const initLayer = () => {
       layerObject.value = olHandler.getLayerHandler().createCustomLayer({
         ...props,
         clear: true,
-        layerId: getLayerId.value,
+        layerId: layerId,
         style: layerStyle.value,
       })
     }
-    handleSelect()
-    handleModify()
     emits('ready', layerObject.value)
   }
 }
 
-const getLayerId = computed(() => {
-  return layerId.value || uuid()
-})
+const initEvent = () => {
+  handleSelect()
+  handleModify()
+}
+
+const _layerId = ref('')
+const setLayerId = () => {
+  if (layerId.value) {
+    _layerId.value = layerId.value
+  } else {
+    _layerId.value = uuid()
+  }
+}
+
+const getLayerId = () => {
+  return _layerId.value
+}
 
 const isValidLayerId = () => {
   if (layerId.value) {
@@ -172,7 +200,7 @@ let interactionHandler = null
 const handleSelect = () => {
   if (interactionHandler === null) {
     interactionHandler = new InteractionHandler(olHandler.map, {
-      layers: [olHandler.getLayerById(getLayerId.value)],
+      layers: [olHandler.getLayerById(getLayerId())],
     })
   }
   interactionHandler.enableSelect(selectable.value, (e) => {
@@ -183,11 +211,22 @@ const handleSelect = () => {
 const handleModify = () => {
   if (interactionHandler === null) {
     interactionHandler = new InteractionHandler(olHandler.map, {
-      layers: [olHandler.getLayerById(getLayerId.value)],
+      layers: [olHandler.getLayerById(getLayerId())],
     })
   }
   interactionHandler.enableModify(modifiable.value, (e) => {
     emits('modify-end', e)
+  })
+}
+
+const handleSnap = () => {
+  if (interactionHandler === null) {
+    interactionHandler = new InteractionHandler(olHandler.map, {
+      layers: [olHandler.getLayerById(getLayerId())],
+    })
+  }
+  interactionHandler.enableSnap(snapable.value, (e) => {
+    // emits('modify-end', e)
   })
 }
 

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2021-12-27 14:28:14
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-24 15:38:56
+ * @LastEditTime: 2024-12-27 14:31:30
  */
 import Base from './Base'
 import 'ol/ol.css'
@@ -27,6 +27,7 @@ import LayerHandler from './plugins/LayerHandler'
 import DrawHandler from './plugins/DrawHandler'
 import DrawConditions from './plugins/DrawConditions'
 import WktHandler from './plugins/WktHandler'
+import GeojsonHandler from './plugins/GeojsonHandler'
 import MeasureHandler from './plugins/MeasureHandler'
 import WfsHandler from './plugins/WfsHandler'
 import InteractionHandler from './plugins/InteractionHandler'
@@ -42,6 +43,7 @@ import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style'
 
 import * as StyleHandler from './plugins/StyleHandler'
 import { deepClone } from '@/VMap/public/utils/base/common'
+import WmsHandler from './plugins/WmsHandler'
 
 class VMap extends Base {
   // map 对象
@@ -88,7 +90,9 @@ class VMap extends Base {
     this.drawConditions = null
     this.measureHandler = null
     this.wktHandler = null
+    this.geojsonHandler = null
     this.wfsHandler = null
+    this.wmsHandler = null
     this.interactionHandler = null
 
     this.GeoHandler = GeometryHandler
@@ -814,6 +818,13 @@ class VMap extends Base {
     return this.wfsHandler
   }
 
+  getWmsHandler(map = this.map) {
+    if (this.wmsHandler == null) {
+      this.wmsHandler = new WmsHandler(map)
+    }
+    return this.wmsHandler
+  }
+
   // 交互
   newInteraction(options, map = this.map) {
     return new InteractionHandler(map, options)
@@ -842,6 +853,13 @@ class VMap extends Base {
       this.wktHandler = new WktHandler()
     }
     return this.wktHandler
+  }
+
+  getGeojsonHandler(){
+    if(this.geojsonHandler == null){
+      this.geojsonHandler = new GeojsonHandler()
+    }
+    return this.geojsonHandler
   }
 
   /**

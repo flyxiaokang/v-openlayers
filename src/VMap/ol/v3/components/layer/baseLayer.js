@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:12:48
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-06 17:17:54
+ * @LastEditTime: 2024-12-23 16:07:15
  */
 
 import { watch } from 'vue'
@@ -33,7 +33,7 @@ export const useProps = {
     default: true,
   },
   opacity: {
-    type: [Number,String],
+    type: [Number, String],
     default: 1,
   },
   extent: {
@@ -61,7 +61,7 @@ export const useProps = {
 export const useEmits = ['ready', 'error']
 
 export const useWatch = (
-  { visible, zIndex, opacity, minZoom, maxZoom, layerStyle },
+  { visible, zIndex, opacity, minZoom, maxZoom, layerStyle, requestParams },
   layer
 ) => {
   watch(visible, (nv) => {
@@ -79,9 +79,20 @@ export const useWatch = (
   watch(maxZoom, (nv) => {
     layer.value.seMaxZoom(Number(nv))
   })
-  watch(layerStyle, (nv) => {
-    layer.value.setStyle(nv)
-  })
+  layerStyle &&
+    watch(layerStyle, (nv) => {
+      layer.value.setStyle(nv)
+    })
+  requestParams &&
+    watch(
+      requestParams,
+      (nv) => {
+        layer.value.getSource().updateParams(nv)
+      },
+      {
+        deep: true,
+      }
+    )
 }
 
 export const useSelect = (selectable) => {

@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-04-19 13:54:02
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-23 17:32:02
+ * @LastEditTime: 2024-12-20 09:34:15
  */
 
 import { Draw, Modify, Snap, Select } from 'ol/interaction'
@@ -15,7 +15,7 @@ export default class InteractionHandler {
   selectedFeature = null
 
   snapList = []
-  constructor(map, options) {
+  constructor(map, options = {}) {
     this.map = map
     this.layers = options.layers
     this.selectable = false
@@ -128,6 +128,20 @@ export default class InteractionHandler {
       this.removeAllSnap()
     }
     this.modifyable = b
+  }
+
+  enableSnap(b = true) {
+    console.log('snap===', b)
+    if (b) {
+      this.removeAllSnap()
+      this.layers.forEach((layer) => {
+        this.addSnap({
+          source: layer.getSource(),
+        })
+      })
+    } else {
+      this.removeAllSnap()
+    }
   }
 
   destorySelect() {

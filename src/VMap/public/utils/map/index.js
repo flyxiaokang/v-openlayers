@@ -8,10 +8,12 @@
  */
 import * as turfJs from './turf.js'
 import * as ol from './ol.js'
+import * as trans from './transform.js'
 
 const VcMapUtils = {
   ...turfJs,
-  ...ol
+  ...ol,
+  ...trans
 }
 
 export default VcMapUtils

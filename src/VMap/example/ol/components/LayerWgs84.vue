@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-10-24 17:48:20
+ * @LastEditTime: 2024-12-30 09:21:49
 -->
 <template>
   <div style="width: 100%; height: 100%">
@@ -142,16 +142,16 @@
         @select-change="handleSelectChange"
       /> -->
 
-      <OlVector
+      <!-- <OlVector
         :features="PolygonGeojson"
         :modifiable="modifyableValue"
         :layer-style="polygonStyle"
         :z-index="103"
         @select-change="handleSelectChange"
-      />
+      /> -->
 
       <!-- tianditu -->
-      <OlTdt
+      <!-- <OlTdt
         map-style="vec"
         :visible="tdtVisibleValue"
         :opacity="opacity"
@@ -166,17 +166,18 @@
         :min-zoom="3"
         :max-zoom="10"
         :z-index="11"
-      />
+      /> -->
 
       <!-- supermap webmocat -->
       <!-- <OlTile
         map-provider="supermap"
         :url="superMapWmtsUrl"
         :request-params="requestParamsWebmocat"
-        :visible="supermapVisibleValue"
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
+        :origin="origin"
+        :resolutions="resolutions"
       /> -->
 
       <!-- <OlTile
@@ -193,6 +194,8 @@
         :request-params="vectorTileParams"
         :visible="vectorTileVisibleValue"
         :opacity="opacity"
+        :max-zoom="18"
+        :min-zoom="9"
       /> -->
 
       <!-- <OlVectortile
@@ -240,7 +243,7 @@
       ></OlDrawer>
 
       <!-- 鹰眼 -->
-      <OlEagle class="vmap-eagle" :offset="[0,30]" expand></OlEagle>
+      <OlEagle class="vmap-eagle" :offset="[0, 30]" expand></OlEagle>
     </OlMap>
   </div>
 </template>
@@ -349,7 +352,10 @@ const popups = ref([
   },
 ])
 const handleAddPopup = () => {
-  const lonlat = [parseInt(20 * Math.random() + 100), parseInt(10 * Math.random() + 30)]
+  const lonlat = [
+    parseInt(20 * Math.random() + 100),
+    parseInt(10 * Math.random() + 30),
+  ]
   popups.value.push({
     label: '我在' + lonlat.join(','),
     position: lonlat,
@@ -449,23 +455,24 @@ const tdtVisibleValue = ref(false)
 
 const supermapVisibleValue = ref(false)
 const superMapWmtsUrl = ref(
-  'http://10.243.45.80:8090/iserver/services/map-ugcv5-China/wmts100'
+  'https://10.243.45.83/hebei-map/iserver/services/map-ugcv5-China4326/wmts100'
 )
 
 const requestParamsWebmocat = {
-  layer: 'China',
-  tilematrixset: 'CUSTOM_China',
-  origin: [60.095214843750085, 54.95361328124993],
-  resolutions: [
-    1.4062500000022087, 0.7031249999891485, 0.35156250000645817,
-    0.17578124999134512, 0.08789062499567256, 0.04394531250972024,
-    0.02197265625486012, 0.01098632812743006, 0.00549316406371503,
-    0.002746582031857515, 0.0013732910159287575, 6.866454960804162e-4,
-    3.4332275992417075e-4, 1.7166136807812276e-4, 8.583068403906138e-5,
-    4.291534201953069e-5, 2.1457682893727956e-5, 1.0728841446863978e-5,
-    5.364420723431989e-6, 2.6822103617159945e-6, 1.3411051808579973e-6,
-  ],
+  layer: 'China4326',
+  tilematrixset: 'Custom_China4326',
 }
+
+const origin = [62.88574218750019, 66.75292968750006]
+const resolutions = [
+  1.4062500000022087, 0.7031249999891485, 0.35156250000645817,
+  0.17578124999134512, 0.08789062499567256, 0.04394531250972024,
+  0.02197265625486012, 0.01098632812743006, 0.00549316406371503,
+  0.002746582031857515, 0.0013732910159287575, 6.866454960804162e-4,
+  3.4332275992417075e-4, 1.7166136807812276e-4, 8.583068403906138e-5,
+  4.291534201953069e-5, 2.1457682893727956e-5, 1.0728841446863978e-5,
+  5.364420723431989e-6, 2.6822103617159945e-6, 1.3411051808579973e-6,
+]
 
 // wmts
 const wmtsVisibleValue = ref(false)
@@ -478,11 +485,19 @@ const requestParamsWmts = reactive({
 })
 
 const vectorTileVisibleValue = ref(false)
-const vectorTileUrl = 'http://localhost:8080/geoserver/gwc/service/wmts'
+// const vectorTileUrl = 'http://localhost:8080/geoserver/gwc/service/wmts'
+// const vectorTileParams = ref({
+//   layer: 'kjr:countries_4326_vt',
+//   // layer: 'kjr:China_3857',
+// })
+
+const vectorTileUrl = '/geoserverApi189/gwc/service/wmts'
 const vectorTileParams = ref({
-  layer: 'kjr:countries_4326_vt',
+  layer: 'basin:dy_gisobj_point',
+
   // layer: 'kjr:China_3857',
 })
+
 // const vectorTileUrlMapbox = 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/kjr%3Acountries_4326_vt@EPSG%3A4326@pbf/{z}/{x}/{y}.pbf'
 
 const vectorTileStyle = ref((feature, resolution) => {
