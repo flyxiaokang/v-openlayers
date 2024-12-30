@@ -1,6 +1,6 @@
 
 ## introduction
-    基于openlayers封装的组件库|v-openlayers
+    基于vue3+openlayers封装的地图组件库|v-openlayers
 
 ## author 
     kangjinrui<1092014304@qq.com>
