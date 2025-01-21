@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-02-10 21:32:55
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-07-25 10:27:44
+ * @LastEditTime: 2025-01-01 11:30:35
  */
 
 // 按需引入
@@ -30,7 +30,7 @@ import OlArcgis from '@/VMap/ol/v3/components/layer/arcgis/index.vue'
 import OlWms from '@/VMap/ol/v3/components/layer/wms/index.vue'
 import OlVectortile from '@/VMap/ol/v3/components/layer/vectorTile/index.vue'
 
-import VueDraggable from '@/VMap/components/v2/Draggable/index.vue'
+import VueDraggable from '@/VMap/components/Draggable/index.vue'
 
 export {
   OlMap,

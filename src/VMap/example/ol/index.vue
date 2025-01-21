@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-12-30 09:25:57
+ * @LastEditTime: 2024-12-16 17:15:33
 -->
 <template>
   <div id="app-container">
@@ -14,7 +14,7 @@
       style="margin: 0 10px; height: 100%"
     >
       <el-tab-pane label="map" name="first">
-        <div style="display: flex;height: 100%;">
+        <div style="display: flex;">
           <LayerWgs84 style="height: 70vh;"></LayerWgs84>
           <!-- <LayerWgs84 style="height: 70vh;"></LayerWgs84>
           <LayerWebmocat style="height: 70vh;"></LayerWebmocat> -->

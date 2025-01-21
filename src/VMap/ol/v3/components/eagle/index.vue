@@ -61,7 +61,7 @@ import VcUtils from '@/VMap/public/utils/base/index'
 import { OlHandler } from '@/VMap/ol/init'
 import { nextTick } from 'vue'
 
-import { useProps, useEmits, usePosition } from '@/VMap/public/use/usePosition'
+import { useProps, usePosition } from '@/VMap/public/use/usePosition'
 
 const olHandlerParent = inject('olHandler')
 const mapConfig = inject('mapConfig')

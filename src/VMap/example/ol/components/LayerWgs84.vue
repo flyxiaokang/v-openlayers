@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-08-17 09:20:06
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-12-30 09:21:49
+ * @LastEditTime: 2025-01-07 17:03:27
 -->
 <template>
   <div style="width: 100%; height: 100%">
@@ -151,8 +151,8 @@
       /> -->
 
       <!-- tianditu -->
-      <!-- <OlTdt
-        map-style="vec"
+      <OlTdt
+        map-style="img"
         :visible="tdtVisibleValue"
         :opacity="opacity"
         :min-zoom="3"
@@ -160,17 +160,18 @@
         :z-index="10"
       />
       <OlTdt
-        map-style="vec_label"
+        map-style="img_label"
         :visible="tdtVisibleValue"
         :opacity="opacity"
         :min-zoom="3"
         :max-zoom="10"
         :z-index="11"
-      /> -->
+      />
 
       <!-- supermap webmocat -->
-      <!-- <OlTile
+      <OlTile
         map-provider="supermap"
+        :visible="supermapVisibleValue"
         :url="superMapWmtsUrl"
         :request-params="requestParamsWebmocat"
         :opacity="opacity"
@@ -178,25 +179,27 @@
         :max-zoom="10"
         :origin="origin"
         :resolutions="resolutions"
-      /> -->
+        :z-index="11"
+      />
 
-      <!-- <OlTile
+      <OlTile
         map-provider="wmts"
         :url="wmtsUrl"
         :request-params="requestParamsWmts"
         :visible="wmtsVisibleValue"
         :opacity="opacity"
-      /> -->
+        :z-index="11"
+      />
 
-      <!-- <OlVectortile
+      <OlVectortile
         :url="vectorTileUrl"
         :layer-style="vectorTileStyle"
         :request-params="vectorTileParams"
         :visible="vectorTileVisibleValue"
         :opacity="opacity"
         :max-zoom="18"
-        :min-zoom="9"
-      /> -->
+        :z-index="11"
+      />
 
       <!-- <OlVectortile
         :url="vectorTileUrlMapbox"
@@ -212,13 +215,13 @@
         z-index="100"
       /> -->
 
-      <!-- <OlArcgis
+      <OlArcgis
         map-provider="tile"
         :url="arcgisTileUrl"
         :visible="arcgisImageVisibleValue"
         opacity="0.6"
         z-index="99"
-      /> -->
+      />
 
       <!-- <OlTile
         map-provider="arcgistile"
@@ -227,13 +230,12 @@
         :opacity="opacity"
       /> -->
 
-      <!-- <OlWms
-        map-provider="image"
+      <OlWms
         :url="wmsUrl"
         :visible="wmsVisibleValue"
         :request-params="wmsRequest"
         :opacity="opacity"
-      /> -->
+      />
 
       <OlDrawer
         class="vmap-drawer"
@@ -485,18 +487,18 @@ const requestParamsWmts = reactive({
 })
 
 const vectorTileVisibleValue = ref(false)
-// const vectorTileUrl = 'http://localhost:8080/geoserver/gwc/service/wmts'
-// const vectorTileParams = ref({
-//   layer: 'kjr:countries_4326_vt',
-//   // layer: 'kjr:China_3857',
-// })
-
-const vectorTileUrl = '/geoserverApi189/gwc/service/wmts'
+const vectorTileUrl = 'http://localhost:8080/geoserver/gwc/service/wmts'
 const vectorTileParams = ref({
-  layer: 'basin:dy_gisobj_point',
-
+  layer: 'kjr:countries_4326_vt',
   // layer: 'kjr:China_3857',
 })
+
+// const vectorTileUrl = '/geoserverApi189/gwc/service/wmts'
+// const vectorTileParams = ref({
+//   layer: 'basin:dy_gisobj_point',
+
+//   // layer: 'kjr:China_3857',
+// })
 
 // const vectorTileUrlMapbox = 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/kjr%3Acountries_4326_vt@EPSG%3A4326@pbf/{z}/{x}/{y}.pbf'
 

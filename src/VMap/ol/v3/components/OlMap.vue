@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-04-12 19:55:31
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-12-23 14:12:15
+ * @LastEditTime: 2025-01-01 11:28:30
 -->
 <template>
   <div class="vmap-container">
@@ -72,10 +72,10 @@ import { V_MOUSE_STATUS, V_THEME } from '@/VMap/global'
 import { useEmits } from '@/VMap/public/use/useEvent'
 
 import OlIdentify from '@/VMap/ol/v3/components/layer/popup/identify/index.vue'
-import MapPopup from './popup/index.vue'
-import MapStatus from '@/VMap/public/components/Map/status/index.vue'
-import TableWidget from '@/VMap/components/Table/index.vue'
-import { deepClone } from '@/VMap/public/utils/base/common'
+// import MapPopup from './popup/index.vue'
+import MapStatus from '@/VMap/components/Map/MapStatus.vue'
+// import TableWidget from '@/VMap/components/Table/index.vue'
+// import { deepClone } from '@/VMap/public/utils/base/common'
 
 const olInstance = getOlHandler()
 const curMapCenter = ref([])

@@ -4,13 +4,14 @@
  * @Author: kangjinrui
  * @Date: 2022-11-21 15:23:41
  * @LastEditors: kangjinrui
- * @LastEditTime: 2023-08-28 16:43:53
+ * @LastEditTime: 2025-01-01 11:24:40
 -->
 <template>
   <el-upload
-    ref="fileUploadRef"
+    ref="refUploadFile"
     :drag="drag"
     action=""
+    style="display: inline-block"
     :show-file-list="false"
     :auto-upload="false"
     :on-change="handleFileChange"
@@ -35,7 +36,7 @@ import * as XLSX from 'xlsx'
 import JSZip from 'jszip'
 
 export default {
-  name: 'VFileUpload',
+  name: 'FileUpload',
   data() {
     return {
       shpFeatures: [],
@@ -71,7 +72,7 @@ export default {
     },
     handleFileChange(files, fileList) {
       var _this = this
-      this.$refs.fileUploadRef.clearFiles()
+      this.$refs.refUploadFile.clearFiles()
       this.model_buffer = false
       this.file = fileList[0]
       //判断文件是否为shp文件

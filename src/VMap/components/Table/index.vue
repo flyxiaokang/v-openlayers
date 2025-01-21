@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-04-19 15:03:21
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-10-01 09:13:29
+ * @LastEditTime: 2025-01-01 14:26:40
 -->
 
 <template>
@@ -17,7 +17,13 @@
       border
       :header-cell-style="handleHeaderStyle"
     >
-      <el-table-column v-if="showIndex" type="index" label="序号" width="80" align="center">
+      <el-table-column
+        v-if="showIndex"
+        type="index"
+        label="序号"
+        width="80"
+        align="center"
+      >
       </el-table-column>
       <el-table-column
         v-for="(item, index) in tableHeader"
@@ -52,19 +58,11 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- <el-pagination
-      v-if="showPagination"
-      small
-      background
-      layout="prev, pager, next"
-      :total="1000"
-      style="margin: 5px 0; float: right"
-    /> -->
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, toRefs } from 'vue'
+import { onMounted, ref, toRefs } from 'vue'
 import { layoutUpdate } from '@/VMap/public/utils/advanced/layout'
 
 const props = defineProps({
@@ -114,7 +112,7 @@ const handleHeaderStyle = () => {
 }
 
 onMounted(() => {
-  layoutUpdate({ tableHeight, container: tableClass.value, offset: -5 })
+  layoutUpdate({ tableHeight, container: tableClass.value, offset: -30 })
 })
 
 const handleClick = (item, row) => {
@@ -127,6 +125,7 @@ export default {
   name: 'VTable',
 }
 </script>
+
 <style lang="scss" scoped>
 .el-icon {
   cursor: pointer;

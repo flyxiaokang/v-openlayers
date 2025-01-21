@@ -11,7 +11,7 @@
 </template>
 <script setup>
 import { ref, inject, toRefs } from 'vue'
-import MapDraw from '@/VMap/public/components/Map/MapDraw.vue'
+import MapDraw from '@/VMap/components/Map/MapDraw.vue'
 
 import { getOlHandler } from '@/VMap/ol/init'
 

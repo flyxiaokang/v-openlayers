@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2023-06-16 20:47:11
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-01-29 10:19:52
+ * @LastEditTime: 2025-01-01 14:31:06
 -->
 <template>
   <Layer :map-provider="mapProvider" />

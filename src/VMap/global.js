@@ -4,7 +4,7 @@
  * @Author: kangjinrui
  * @Date: 2022-01-19 14:30:59
  * @LastEditors: kangjinrui
- * @LastEditTime: 2024-06-06 17:02:15
+ * @LastEditTime: 2025-01-01 14:16:37
  */
 export const V_THEME = {
   light: 'light',
@@ -188,16 +188,6 @@ export const V_WEB_MECATOR = {
   },
 }
 
-const V_MAP_GLOBAL = {
-  'EPSG:4326': V_WGS84,
-  'EPSG:3857': V_WEB_MECATOR,
-  V_MAP_PROVIDER,
-  V_GEO_TYPE,
-  V_BASE_MAP,
-}
-
-export default V_MAP_GLOBAL
-
 export function getTdtUrl({
   mapStyle = 'TDT_IMG',
   prj = '4326',
@@ -249,3 +239,14 @@ export function getTdtUrlForCesium({
     return ''
   }
 }
+
+const V_MAP_GLOBAL = {
+  'EPSG:4326': V_WGS84,
+  'EPSG:3857': V_WEB_MECATOR,
+  V_MAP_PROVIDER,
+  V_GEO_TYPE,
+  V_BASE_MAP,
+}
+
+export default V_MAP_GLOBAL
+
